@@ -6,7 +6,7 @@ import './index.css';
 import { initWS, auth } from '../../util/strophe-websocket';
 
 const FormItem = Form.Item;
-const { TextArea } = Input;
+const { TextArea } = Input; 
 
 class NormalLoginForm extends React.Component {
   constructor() {
