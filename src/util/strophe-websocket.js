@@ -1,15 +1,12 @@
-/*
- * @Author: lfy 
- * @Date: 2018-10-25 13:55:53 
- * @Last Modified by: lfy
- * @Last Modified time: 2018-10-25 15:56:35
- */
-
+// import Strophe from "strophe.js";
+let StropheJS = require('strophe.js')
+let Strophe = StropheJS.Strophe
 
 const connectionState = ["正在连接..", "连接已建立", "正在关闭..", "已经关闭"];
 const hostname = '192.168.201.147';
 const port = '7070';
 const host = `ws://${hostname}:${port}/ws/`;
+// const host = `/ws/`;
 let userinfo = {
 	username:'',
 	password:''
@@ -46,15 +43,42 @@ function wsClose(event) {
 }
 
 
+function linkCallback(e) {
+	let ws = window._IMWS
+	var steam3 = `<presence id="${window.msId}">
+		<status>Online</status>
+		<priority>1</priority>
+	</presence>`
+	steam3 = StropheJS.$pres({
+		id:window.msId,
+	})
+	.c('status',{},'Online')
+	.c('priority',{},'1')
+	.tree();
+	// var dom = parseDom(steam3)
+	ws.send(steam3)
+}
 
-
+function parseDom(nodelist) {
+	var objE = document.createElement("div");  
+	objE.innerHTML = nodelist;
+	return objE.childNodes;
+  }
 
 function initWS(_userinfo){
 	userinfo = {..._userinfo};
 	if (window.WebSocket) {
 		//OpenFire是实现了WebSocket的子协议
-		var connection = new WebSocket(host, "xmpp");
+		var connection = new Strophe.Connection(host, {protocol:'ws',port});
 		window._IMWS = connection;
+
+		const connectParam = [
+			`${userinfo.username}@${hostname}`, // JID
+			`${userinfo.password}`, // password
+			linkCallback
+		]
+
+		connection.connect(...connectParam)
 		console.log(connectionState[connection.readyState]);
 		//注册连接建立时的方法
 		connection.onopen = wsOpen;

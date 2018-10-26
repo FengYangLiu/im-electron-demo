@@ -7,5 +7,4 @@
 这个脚手架创建项目
 2. 使用electron 作为桌面端的壳子
 3. 使用antd来作为开发框架
-
-
+4. 为了更简单的操作XMPP 使用 Strophe.js(版本为1.3.0支持ie11以上)的XMPP框架来使用websocket协议与方法
