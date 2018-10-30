@@ -1,5 +1,6 @@
 {
 	"git.ignoreLimitWarning": true,
 	"fileheader.Author": "lfy",
-	"fileheader.LastModifiedBy": "lfy"
+	"fileheader.LastModifiedBy": "lfy",
+	"files.eol": "\n"
 }

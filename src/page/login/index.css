@@ -8,5 +8,15 @@
 }
 
 #components-form-demo-normal-login .login-form-button {
+	width: 30%;
+
+}
+#components-form-demo-normal-login .button-wrap{
+	display: flex;
+	justify-content: space-between;
 	width: 100%;
+}
+
+#components-form-demo-normal-login .chatList{
+	text-align: left;
 }
