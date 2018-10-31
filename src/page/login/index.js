@@ -2,11 +2,12 @@
  * @Author: lfy 
  * @Date: 2018-10-29 17:39:43 
  * @Last Modified by: lfy
- * @Last Modified time: 2018-10-31 11:38:34
+ * @Last Modified time: 2018-10-31 14:56:57
  */
 import React from "react";
 import { Form, Icon, Input, Button, Card, Avatar, Row, Col } from "antd";
 import store from "../../store/index.js";
+import { connect } from 'react-redux';
 
 // websocket 暴露接口
 import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
@@ -28,14 +29,13 @@ class NormalLoginForm extends React.Component {
       tagetUser: "admin",
       chatList: []
     };
-    console.log(store.getState());
 
     // 订阅回调
-    store.subscribe(this.handleChangeChatList);
+    // store.subscribe(this.handleChangeChatList);
   }
   componentWillMount() {
     this.setState({
-      chatList: store.getState().chatList
+      chatList: this.props.chatList
     });
   }
 
@@ -46,7 +46,6 @@ class NormalLoginForm extends React.Component {
       if (!err) {
         console.log("Received values of form: ", values);
         initWS(values);
-        // auth(window._IMWS)
       }
     });
   };
@@ -63,14 +62,8 @@ class NormalLoginForm extends React.Component {
       msg: msgText
     };
 
-    // 添加一个动作
-    const action = getSendMsgAction({
-      name: 'lfy1',
-      msg: msgText
-    });
-
-    // 发送动作
-    store.dispatch(action);
+    // 调用store触发redux
+    this.props.handleActionSendMsg(msgText)
 
     imSendMsg(info);
     this.setState({
@@ -105,9 +98,11 @@ class NormalLoginForm extends React.Component {
 
 
 
+
+
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { tagetUser, chatList } = this.state;
+    const { tagetUser, msgText } = this.state;
 
     return (
       <div id="components-form-demo-normal-login">
@@ -169,7 +164,7 @@ class NormalLoginForm extends React.Component {
 
         <TextArea
           rows="3"
-          value={this.state.msgText}
+          value={msgText}
           onChange={value => {
             this.handleChangeMsgText(value);
           }}
@@ -187,7 +182,7 @@ class NormalLoginForm extends React.Component {
           </Button>
 
           <div className="chatList">
-            {chatList.map((item, index) => (
+            {this.props.chatList.map((item, index) => (
               <Card style={{ width: 300, marginTop: 16 }} key={index}>
                 <Meta
                   avatar={
@@ -213,5 +208,28 @@ class NormalLoginForm extends React.Component {
 }
 
 const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
+// 映射 state 至 props
+const mapStateToProps = (state) => {
+  console.log(state)
+  return {
+    chatList: state.chatList
+  }
+}
 
-export default WrappedNormalLoginForm;
+// store.dispatch, props
+const mapDispatchToProps = (dispatch) => {
+  return {
+      // 回调发送消息动作
+  handleActionSendMsg :(msg) => {
+    // 添加一个动作
+    const action = getSendMsgAction({
+      name: 'lfy1',
+      msg
+    });
+    // 发送动作
+    dispatch(action);
+}
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(WrappedNormalLoginForm) ;

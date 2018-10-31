@@ -1,5 +1,6 @@
 import { IM_SEND_MSG } from './actionTypes';
 
+// 默认数据
 const defaultState = {
 	inputValue: '',
 	chatList: [{

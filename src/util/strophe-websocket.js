@@ -2,12 +2,11 @@
  * @Author: lfy 
  * @Date: 2018-10-29 16:07:46 
  * @Last Modified by: lfy
- * @Last Modified time: 2018-10-31 10:56:35
+ * @Last Modified time: 2018-10-31 14:33:55
  */
 
 import store from '../store/index.js';
-import { IM_SEND_MSG } from '../store/actionTypes';
-// import Strophe from "strophe.js";
+import { getSendMsgAction } from '../store/actionCreators'
 let StropheJS = require('strophe.js')
 let Strophe = StropheJS.Strophe
 
@@ -20,15 +19,13 @@ let userinfo = {
 	password: ''
 }
 
-// 订阅回调
-// store.subscribe(this.handleStoreSendMsg);
-
+// websocket连接后验证后的回调
 function linkCallback(status) {
 	let ws = window._IMWS
 	let connected = ws.connected
 	/*
 	//xmpp协议：更换状态 
-	var steam3 = `<presence id="${window.msId}">
+	let steam3 = `<presence id="${window.msId}">
 		<status>Online</status>
 		<priority>1</priority>
 	</presence>`
@@ -51,10 +48,9 @@ function linkCallback(status) {
 			console.log("登录失败！");
 		} else if (status === Strophe.Status.DISCONNECTED) {
 			console.log("连接断开！");
-			connected = false;
 		} else if (status === Strophe.Status.CONNECTED) {
 			console.log("连接成功，可以开始聊天了！");
-			connected = true;
+
 			// 当接收到<message>节，调用onMessage回调函数
 			ws.addHandler(onMessage, null, 'message', null, null, null);
 
@@ -64,13 +60,12 @@ function linkCallback(status) {
 	}
 }
 
-
+// 初始化strophe 的 websocket 
 function initWS(_userinfo) {
-	userinfo = { ..._userinfo
-	};
+	userinfo = { ..._userinfo };
 	if (window.WebSocket) {
 		//OpenFire是实现了WebSocket的子协议
-		var connection = new Strophe.Connection(host, {
+		let connection = new Strophe.Connection(host, {
 			protocol: 'ws',
 			port,
 			sync: true
@@ -84,28 +79,18 @@ function initWS(_userinfo) {
 		]
 
 		connection.connect(...connectParam)
-
-
-		// //注册连接建立时的方法
-		// connection.onopen = wsOpen;
-
-		// //注册连接关闭时的方法
-		// connection.onclose = wsClose;
-		// //注册收到消息时的方法
-		// connection.onmessage = wsMsg;
 	}
 }
 
-// 接收到<message>
+// 接收到<message> 的回调
 function onMessage(msg) {
 	// 解析出<message>的from、type属性，以及body子元素
-	var from = msg.getAttribute('from');
-	var type = msg.getAttribute('type');
-	var elems = msg.getElementsByTagName('body');
+	let from = msg.getAttribute('from');
+	let type = msg.getAttribute('type');
+	let elems = msg.getElementsByTagName('body');
 
 	if (type === "chat" && elems.length > 0) { // 获取消息
-		var body = elems[0];
-		// $("#msg").append(from + ":<br>" + Strophe.getText(body) + "<br>")
+		let body = elems[0];
 		const send_msg_name = from.split('@')[0];
 		const send_msg_text = Strophe.getText(body);
 		let msg = {
@@ -113,11 +98,11 @@ function onMessage(msg) {
 			msg:send_msg_text
 		};
 		handleStoreGetMsg(msg)
-		// console.log(Strophe.getText(body))
 	}
 	return true;
 }
 
+//  发送消息
 function imSendMsg(info) {
 	let ws = window._IMWS
 	let connected = ws.connected || false
@@ -128,7 +113,7 @@ function imSendMsg(info) {
 		}
 
 		// 创建一个<message>元素并发送
-		var msg = StropheJS.$msg({
+		let msg = StropheJS.$msg({
 			to: `${info.to}@${hostname}`,
 			from: `${userinfo.username}@${hostname}`,
 			type: 'chat'
@@ -139,6 +124,7 @@ function imSendMsg(info) {
 	}
 }
 
+// 登出回调
 function outLogin() {
 	let ws = window._IMWS;
 	let steam = StropheJS.$build('close', {
@@ -148,16 +134,12 @@ function outLogin() {
 	ws.send(steam)
 }
 
+// 获取消息回调
 function handleStoreGetMsg(value){
 	// 一个行为
-	const action = {
-		type: IM_SEND_MSG,
-		value
-	}
-
+	const action = getSendMsgAction(value)
 	// 发送动作
 	store.dispatch(action);
-
 }
 
 export {
