@@ -2,7 +2,7 @@
  * @Author: lfy 
  * @Date: 2018-10-29 17:39:43 
  * @Last Modified by: lfy
- * @Last Modified time: 2018-10-31 10:10:27
+ * @Last Modified time: 2018-10-31 11:38:34
  */
 import React from "react";
 import { Form, Icon, Input, Button, Card, Avatar, Row, Col } from "antd";
@@ -11,8 +11,9 @@ import store from "../../store/index.js";
 // websocket 暴露接口
 import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 
-// actionTypes 映射
-import { IM_SEND_MSG } from '../../store/actionTypes.js';
+// action 统一管理
+import { getSendMsgAction } from '../../store/actionCreators';
+
 import "./index.css";
 
 const FormItem = Form.Item;
@@ -63,13 +64,10 @@ class NormalLoginForm extends React.Component {
     };
 
     // 添加一个动作
-    const action = {
-      type: IM_SEND_MSG,
-      value: {
-        name: 'lfy1',
-        msg: msgText
-      }
-    };
+    const action = getSendMsgAction({
+      name: 'lfy1',
+      msg: msgText
+    });
 
     // 发送动作
     store.dispatch(action);
