@@ -2,11 +2,11 @@
  * @Author: lfy 
  * @Date: 2018-10-29 16:07:46 
  * @Last Modified by: lfy
- * @Last Modified time: 2018-10-30 16:27:05
+ * @Last Modified time: 2018-10-31 10:56:35
  */
 
 import store from '../store/index.js';
-
+import { IM_SEND_MSG } from '../store/actionTypes';
 // import Strophe from "strophe.js";
 let StropheJS = require('strophe.js')
 let Strophe = StropheJS.Strophe
@@ -151,7 +151,7 @@ function outLogin() {
 function handleStoreGetMsg(value){
 	// 一个行为
 	const action = {
-		type: 'send_msg',
+		type: IM_SEND_MSG,
 		value
 	}
 
