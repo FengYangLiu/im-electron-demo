@@ -1,17 +1,24 @@
-import { IM_SEND_MSG } from './actionTypes';
+import {
+	IM_LOGIN_USER_INFO,
+	IM_SEND_MSG
+} from './actionTypes';
 
 // 默认数据
 const defaultState = {
 	inputValue: '',
-	chatList: [{
-		name: 'lfy1',
-		msg: 'hello'
+	LOGIN_USER_INFO: {
+		username: '',
+		password: ''
 	},
-	{
-		name: 'admin',
-		msg: 'hi'
-	}
-]
+	chatList: [{
+			name: 'lfy1',
+			msg: 'hello'
+		},
+		{
+			name: 'admin',
+			msg: 'hi'
+		}
+	]
 }
 
 // reducer 可以接收state，但是绝对不能修改state
@@ -21,6 +28,10 @@ export default (state = defaultState, action) => {
 		const newState = JSON.parse(JSON.stringify(state))
 		newState.chatList.push(action.value)
 		console.log(newState)
+		return newState;
+	} else if (action.type === IM_LOGIN_USER_INFO) {
+		const newState = JSON.parse(JSON.stringify(state))
+		newState.LOGIN_USER_INFO = action.value;
 		return newState;
 	}
 	return state

@@ -1,22 +1,21 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 import store from './store'
 import './index.css';
+import Login from './page/login'
 // import './util/websocket'
 
-
-import Login from './page/login'
 ReactDOM.render(
 <Provider store={store}>
-	<div>
+	<Fragment>
 		<BrowserRouter>
 			<Route path='/' render={
 				()=>(<Login />)
 			}>	
 			</Route>
 		</BrowserRouter>
-	</div>
+	</Fragment>
 </Provider>
 , document.getElementById('root'));

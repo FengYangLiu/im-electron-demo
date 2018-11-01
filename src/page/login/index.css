@@ -1,22 +1,24 @@
-#components-form-demo-normal-login{
-	max-width: 300px;
-	margin: 0 auto;
-}
-
-#components-form-demo-normal-login .login-form-forgot {
-	float: right;
-}
-
-#components-form-demo-normal-login .login-form-button {
-	width: 30%;
-
-}
-#components-form-demo-normal-login .button-wrap{
+#im-login{
 	display: flex;
-	justify-content: space-between;
+	height: 100%;
+	max-width: 350px;
+	flex-direction: column;
+	border-radius: 5px;
+	background-color: #f0f5f9;
+	flex: 1;
+}
+.im-login-title{
+	width: 100%;
+	text-align: center;
+	padding: 10px 5px 15px;
+}
+.im-login_title-text{
+	font-size: 24px;
+	font-weight: 500;
+}
+.login-form-button {
 	width: 100%;
 }
-
-#components-form-demo-normal-login .chatList{
-	text-align: left;
+.im-login-content{
+	padding: 0 20px;
 }

@@ -2,10 +2,12 @@
  * @Author: lfy 
  * @Date: 2018-10-29 17:39:43 
  * @Last Modified by: lfy
- * @Last Modified time: 2018-10-31 14:56:57
+ * @Last Modified time: 2018-11-01 14:33:27
  */
-import React from "react";
-import { Form, Icon, Input, Button, Card, Avatar, Row, Col } from "antd";
+import React, { Component } from "react";
+import { Form, Icon, Input, Button, Card, Spin, Avatar, Row, Col } from "antd";
+import WindowHandle from '../components/WindowHandle';
+
 import store from "../../store/index.js";
 import { connect } from 'react-redux';
 
@@ -13,7 +15,7 @@ import { connect } from 'react-redux';
 import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 
 // action 统一管理
-import { getSendMsgAction } from '../../store/actionCreators';
+import { getSendMsgAction, getLoginUserInfoAction } from '../../store/actionCreators';
 
 import "./index.css";
 
@@ -21,31 +23,34 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 const { Meta } = Card;
 
-class NormalLoginForm extends React.Component {
+class LoginMain extends Component {
   constructor(props) {
     super(props);
     this.state = {
       msgText: "",
       tagetUser: "admin",
+      logging:false,
       chatList: []
     };
-
-    // 订阅回调
-    // store.subscribe(this.handleChangeChatList);
   }
+
   componentWillMount() {
     this.setState({
       chatList: this.props.chatList
     });
   }
 
-  // submit回调
+  // 登录submit回调
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log("Received values of form: ", values);
-        initWS(values);
+        console.log("发送的变量: ", values);
+        this.props.handleActionUserLogin(values);
+        this.setLoginState(true);
+        initWS(()=>{
+          this.setLoginState(false);
+        });
       }
     });
   };
@@ -96,73 +101,82 @@ class NormalLoginForm extends React.Component {
     })
   }
 
-
-
-
-
+  setLoginState = (state) => {
+    this.setState({
+      logging:state
+    })
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { tagetUser, msgText } = this.state;
+    const { tagetUser, msgText, logging } = this.state;
 
     return (
-      <div id="components-form-demo-normal-login">
-        <Form onSubmit={this.handleSubmit} className="login-form">
-          <FormItem>
-            {getFieldDecorator("username", {
-              rules: [
-                { required: true, message: "Please input your username!" }
-              ],
-              initialValue: "lfy1"
-            })(
-              <Input
-                prefix={
-                  <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                placeholder="Username"
-              />
-            )}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("password", {
-              rules: [
-                { required: true, message: "Please input your Password!" }
-              ],
-              initialValue: "lfy1"
-            })(
-              <Input
-                prefix={
-                  <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                type="password"
-                placeholder="Password"
-              />
-            )}
-          </FormItem>
-          <FormItem>
-            <Row>
-              <Col span={24} style={{ textAlign: "right" }}>
-                <div className="button-wrap">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="login-form-button"
-                  >
-                    登入
-                  </Button>
-                  <Button
-                    type="danger"
-                    className="login-form-button"
-                    onClick={this.handleOutLogin}
-                  >
-                    退出
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-          </FormItem>
-        </Form>
+      <div id="im-login">
+        <Spin size="large" spinning={logging} delay='200'>
+        <div className="im-login-title">
+          <WindowHandle/>
+          <span className="im-login_title-text">IM'LOGIN</span>
+        </div>
+        <div className="im-login-content">
+          <Form onSubmit={this.handleSubmit} className="login-form">
+            <FormItem>
+              {getFieldDecorator("username", {
+                rules: [
+                  { required: true, message: "请输入用户名" }
+                ],
+                initialValue: "lfy1"
+              })(
+                <Input
+                  prefix={
+                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  placeholder="Username"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator("password", {
+                rules: [
+                  { required: true, message: "请输入密码" }
+                ],
+                initialValue: "lfy1"
+              })(
+                <Input
+                  prefix={
+                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  type="password"
+                  placeholder="Password"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              {/* <Row>
+                <Col span={24} style={{ textAlign: "right" }}> */}
+                  {/* <div className="button-wrap"> */}
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      className="login-form-button"
+                    >
+                      登录
+                    </Button>
+                    {/* <Button
+                      type="danger"
+                      className="login-form-button"
+                      onClick={this.handleOutLogin}
+                    >
+                      退出
+                    </Button> */}
+                  {/* </div> */}
+                {/* </Col>
+              </Row> */}
+            </FormItem>
+          </Form>
+        </div>
+        </Spin>
 
-        <TextArea
+        {/* <TextArea
           rows="3"
           value={msgText}
           onChange={value => {
@@ -202,12 +216,13 @@ class NormalLoginForm extends React.Component {
             ))}
           </div>
         </div>
+      */}
       </div>
     );
   }
 }
 
-const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
+const WrappedLoginMain = Form.create()(LoginMain);
 // 映射 state 至 props
 const mapStateToProps = (state) => {
   console.log(state)
@@ -228,8 +243,13 @@ const mapDispatchToProps = (dispatch) => {
     });
     // 发送动作
     dispatch(action);
-}
+  },
+  // 登录回调动作
+  handleActionUserLogin: (value) =>{
+    const action = getLoginUserInfoAction(value)
+    dispatch(action)
+  }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(WrappedNormalLoginForm) ;
+export default connect(mapStateToProps, mapDispatchToProps)(WrappedLoginMain) ;

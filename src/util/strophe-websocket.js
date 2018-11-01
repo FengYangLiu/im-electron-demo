@@ -2,25 +2,32 @@
  * @Author: lfy 
  * @Date: 2018-10-29 16:07:46 
  * @Last Modified by: lfy
- * @Last Modified time: 2018-10-31 14:33:55
+ * @Last Modified time: 2018-11-01 19:09:09
  */
 
 import store from '../store/index.js';
 import { getSendMsgAction } from '../store/actionCreators'
+import ElectronAid from '../electron'
+
+console.log(ElectronAid)
+
+
 let StropheJS = require('strophe.js')
 let Strophe = StropheJS.Strophe
 
 const hostname = '192.168.201.147';
 const port = '7070';
 const host = `ws://${hostname}:${port}/ws/`;
+let LOGIN_USER_INFO = store.getState().LOGIN_USER_INFO;
 
-let userinfo = {
-	username: '',
-	password: ''
+// 订阅器，订阅store改变状态
+store.subscribe(handleChangeStore)
+function handleChangeStore() {
+	LOGIN_USER_INFO = store.getState().LOGIN_USER_INFO
 }
 
 // websocket连接后验证后的回调
-function linkCallback(status) {
+function linkCallback(status, cb) {
 	let ws = window._IMWS
 	let connected = ws.connected
 	/*
@@ -50,20 +57,23 @@ function linkCallback(status) {
 			console.log("连接断开！");
 		} else if (status === Strophe.Status.CONNECTED) {
 			console.log("连接成功，可以开始聊天了！");
-
+			if(cb) cb()
+			
 			// 当接收到<message>节，调用onMessage回调函数
 			ws.addHandler(onMessage, null, 'message', null, null, null);
 
 			// 首先要发送一个<presence>给服务器（initial presence）
 			ws.send(StropheJS.$pres().tree());
+
+			// 对窗口通讯打开主窗口
+			ElectronAid.openMainWindow&&ElectronAid.openMainWindow()
 		}
 	}
 }
 
 // 初始化strophe 的 websocket 
-function initWS(_userinfo) {
-	userinfo = { ..._userinfo };
-	if (window.WebSocket) {
+function initWS(cb) {
+	if (LOGIN_USER_INFO.username) {
 		//OpenFire是实现了WebSocket的子协议
 		let connection = new Strophe.Connection(host, {
 			protocol: 'ws',
@@ -73,9 +83,11 @@ function initWS(_userinfo) {
 		window._IMWS = connection;
 
 		const connectParam = [
-			`${userinfo.username}@${hostname}`, // JID
-			`${userinfo.password}`, // password
-			linkCallback // 连接后的回调
+			`${LOGIN_USER_INFO.username}@${hostname}`, // JID
+			`${LOGIN_USER_INFO.password}`, // password
+			(status) => {
+				linkCallback(status, cb) // 连接后的回调
+			}
 		]
 
 		connection.connect(...connectParam)
@@ -88,7 +100,7 @@ function onMessage(msg) {
 	let from = msg.getAttribute('from');
 	let type = msg.getAttribute('type');
 	let elems = msg.getElementsByTagName('body');
-
+	debugger
 	if (type === "chat" && elems.length > 0) { // 获取消息
 		let body = elems[0];
 		const send_msg_name = from.split('@')[0];
@@ -115,7 +127,7 @@ function imSendMsg(info) {
 		// 创建一个<message>元素并发送
 		let msg = StropheJS.$msg({
 			to: `${info.to}@${hostname}`,
-			from: `${userinfo.username}@${hostname}`,
+			from: `${LOGIN_USER_INFO.username}@${hostname}`,
 			type: 'chat'
 		}).c("body", null, info.msg);
 		ws.send(msg.tree());

@@ -1,19 +1,81 @@
+// import { createWindow as createLoginWindow } from './src/electron/login';
+
 // electron交互的JS
 const {
 	app,
-	BrowserWindow
+	BrowserWindow,
+	ipcMain
 } = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let loginWindow;
+let mainWindow;
+
+// 初始化LoginWindow
+function initLoginWindwo(){
+	if(mainWindow) {// 判断主窗口是否存在存在则关闭并重置
+		mainWindow.close();
+		mainWindow = null;
+	}
+
+	// 创建
+	createLoginWindow()
+}
+
+// 初始化主窗口
+function initMainWindow() {
+	if(loginWindow){
+		loginWindow.close();
+		loginWindow = null;
+	}
+	createWindow()
+}
+
+// 初始化 从主进程到渲染进程的异步通信。
+function initIpc() {
+	// 打开主窗口回调
+	ipcMain.on('ipcOpenMainWindow',() => {
+		if(mainWindow){ // 实例存在则弹出
+			mainWindow.show()
+		}else{// 不存在则初始化，如login转到main
+			initMainWindow();
+		}
+	})
+}
+
+// 创建 login窗口
+function createLoginWindow() {
+	loginWindow = new BrowserWindow({
+		width: 300,
+		height: 350,
+		frame: false, // 边框菜单设置
+		show: true,
+		transparent: true
+	})
+
+	
+	// 窗口加载网址
+	loginWindow.loadURL('http://localhost:3000/');
+	// loginWindow.webContents.openDevTools()
+
+	loginWindow.on('closed', function () {
+		loginWindow = null
+	})
+}
+
 
 function createWindow() {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		width: 800,
-		height: 600
+		width: 1024,
+		height: 768,
+		minWidth:350,
+		minHeight:350,
+		frame: false, // 边框菜单设置
+		show: false // 是否显示
 	})
+
 
 	// 窗口加载网址
 	mainWindow.loadURL('http://localhost:3000/');
@@ -22,7 +84,19 @@ function createWindow() {
 	//   mainWindow.loadFile('index.html')
 
 	// 开启调试窗口
-	  mainWindow.webContents.openDevTools()
+	//   mainWindow.webContents.openDevTools()
+
+	// 监听按键
+	mainWindow.webContents.on('before-input-event', (event, input) => {
+		if(input.code === 'F12'){
+			mainWindow.webContents.toggleDevTools()
+		}
+	  })
+	
+	// 创建后初显示 更优雅的显示(官方标注，减少白屏)
+	mainWindow.on('ready-to-show', () => {
+		if(mainWindow) mainWindow.show();
+	})
 
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function () {
@@ -36,7 +110,14 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', ()=>{
+	// 初始化LoginWindow
+	initLoginWindwo()
+	// createLoginWindow()
+
+	// 初始化ipcMain 主页面和渲染页面（网页）之间的通讯
+	initIpc();
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -54,6 +135,3 @@ app.on('activate', function () {
 		createWindow()
 	}
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
