@@ -17,7 +17,8 @@ import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 // action 统一管理
 import { getSendMsgAction, getLoginUserInfoAction } from '../../store/actionCreators';
 
-import "./index.css";
+import "./index.less";
+// import "./index.css";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
