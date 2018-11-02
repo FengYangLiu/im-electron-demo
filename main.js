@@ -78,7 +78,7 @@ function createWindow() {
 
 
 	// 窗口加载网址
-	mainWindow.loadURL('http://localhost:3000/');
+	mainWindow.loadURL('http://localhost:3000/#/chat');
 
 	//  and load the index.html of the app.
 	//   mainWindow.loadFile('index.html')
