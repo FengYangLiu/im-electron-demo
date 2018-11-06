@@ -4,6 +4,7 @@ import { Icon } from "antd";
 
 import ImChat from "../chat";
 import ImUserList from "../userList";
+import ChatSection from '../chat/chatSection'
 
 import "./index.less";
 class ImMain extends Component {
@@ -23,6 +24,9 @@ class ImMain extends Component {
           <Switch>
             <Route path="/chat" render={() => <ImChat />} />
             <Route path="/userList" component={ImUserList} />
+          </Switch>
+          <Switch>
+            <Route path="/chat/:id" render={() => (<ChatSection/>)} ></Route>
           </Switch>
         </div>
       </div>

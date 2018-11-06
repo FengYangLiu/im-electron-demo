@@ -11,6 +11,9 @@ export const IM_WEBSOCKET = 'im_websocket';
 //websocket连接状态
 export const IM_CONNECTED = 'im_connected';
 
+// openId 
+export const IM_OPEN_ID = 'im_open_id';
+
 // 记录登录用户的信息
 export const IM_LOGIN_USER_INFO = 'im_login_user_info';
 

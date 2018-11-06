@@ -7,7 +7,8 @@
  */
 import {
 	IM_SEND_MSG,
-	IM_LOGIN_USER_INFO
+	IM_LOGIN_USER_INFO,
+	IM_OPEN_ID
 } from './actionTypes';
 
 /**
@@ -25,5 +26,14 @@ export const getLoginUserInfoAction = (value) => ({
  */
 export const getSendMsgAction = (value) => ({
 	type: IM_SEND_MSG,
+	value
+})
+
+/**
+ * 获取OPEN_ID
+ * @param {String} value openid
+ */
+export const hadleSendMsgAction = (value) => ({
+	type:IM_OPEN_ID,
 	value
 })
