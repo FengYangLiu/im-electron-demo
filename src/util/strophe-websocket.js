@@ -29,9 +29,10 @@ const port = IM_SERVE.port;
 const host = IM_HOST;
 
 // store 统一
-let LOGIN_USER_INFO = store.getState().LOGIN_USER_INFO;
+let LOGIN_USER_INFO = store.getState().LOGIN_USER_INFO ;
 let IM_OPEN_ID = store.getState().IM_OPEN_ID;
-let IM_WS = null;
+// let IM_WS = null
+// window.IM_WS=null;
 
 // 订阅器，订阅store改变状态
 store.subscribe(handleChangeStore)
@@ -44,7 +45,7 @@ function handleChangeStore() {
 // websocket连接后验证后的回调
 function linkCallback(status, cb) {
 
-	let connected = IM_WS.connected
+	let connected = window.IM_WS.connected
 	/*
 	//xmpp协议：更换状态 
 	let steam3 = `<presence id="${window.msId}">
@@ -60,7 +61,7 @@ function linkCallback(status, cb) {
 			.c('show', {}, 'Online')
 			.c('priority', {}, '1')
 			.tree();
-		IM_WS.send(steam)
+			window.IM_WS.send(steam)
 
 		if (status === Strophe.Status.CONNECTING) {
 			console.log("连接中！");
@@ -75,10 +76,10 @@ function linkCallback(status, cb) {
 			if (cb) cb()
 
 			// 当接收到<message>节，调用onMessage回调函数
-			IM_WS.addHandler(onMessage, null, 'message', null, null, null);
+			window.IM_WS.addHandler(onMessage, null, 'message', null, null, null);
 
 			// 首先要发送一个<presence>给服务器（initial presence）
-			IM_WS.send(StropheJS.$pres().tree());
+			window.IM_WS.send(StropheJS.$pres().tree());
 
 			// 对窗口通讯打开主窗口
 			if (ElectronAid.openMainWindow) { // 存在则打开窗口不存在则跳转路由
@@ -92,7 +93,9 @@ function linkCallback(status, cb) {
 
 // 初始化strophe 的 websocket 
 function initWS(cb) {
+	LOGIN_USER_INFO = JSON.parse(localStorage.LOGIN_USER_INFO)
 	if (LOGIN_USER_INFO.username) {
+		localStorage.setItem('LOGIN_USER_INFO',JSON.stringify(LOGIN_USER_INFO))
 		//OpenFire是实现了WebSocket的子协议
 		let connection = new Strophe.Connection(host, {
 			protocol: 'ws',
@@ -100,16 +103,10 @@ function initWS(cb) {
 			sync: true
 		});
 
-		IM_WS = connection;
+		window.IM_WS = connection;
 
 		// 监听用于接收进入连接的XML数据
-		IM_WS.xmlInput = getImXMLRespone;
-
-		IM_WS.xmlOutput = 
-			(e) => {
-				console.log(e)
-			}
-
+		window.IM_WS.xmlInput = getImXMLRespone;
 			const connectParam = [
 				`${LOGIN_USER_INFO.username}@${hostname}`, // JID
 				`${LOGIN_USER_INFO.password}`, // password
@@ -118,7 +115,7 @@ function initWS(cb) {
 				}
 			]
 
-			IM_WS.connect(...connectParam)
+			window.IM_WS.connect(...connectParam)
 		}
 	}
 
@@ -165,12 +162,12 @@ function initWS(cb) {
 
 	//  发送消息
 	function imSendMsg(info, cb) {
-		if (!IM_WS) {
+		if (!window.IM_WS) {
 			// alert("请输入联系人！");
 			window.location.hash = '#/'
 			return;
 		}
-		let connected = IM_WS.connected || false
+		let connected = window.IM_WS.connected || false
 		if (connected) {
 			if (!info.to) {
 				alert("请输入联系人！");
@@ -179,11 +176,11 @@ function initWS(cb) {
 
 			// 创建一个<message>元素并发送
 			let msg = StropheJS.$msg({
-				to: `${info.to}@${IM_WS.domain}`,
-				from: IM_WS.authzid,
+				to: `${info.to}@${window.IM_WS.domain}`,
+				from: window.IM_WS.authzid,
 				type: 'chat'
 			}).c("body", null, info.msg);
-			IM_WS.sendPresence(msg.tree(), (evt) => {
+			window.IM_WS.sendPresence(msg.tree(), (evt) => {
 				console.log(evt)
 			}, (err) => {
 				cb&&cb()
@@ -199,7 +196,7 @@ function initWS(cb) {
 				xmlns: "urn:ietf:params:xml:ns:xmpp-framing"
 			})
 			.tree();
-		IM_WS.send(steam)
+			window.IM_WS.send(steam)
 	}
 
 	// 获取消息回调

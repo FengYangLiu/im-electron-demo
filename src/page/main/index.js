@@ -5,9 +5,25 @@ import { Icon } from "antd";
 import ImChat from "../chat";
 import ImUserList from "../userList";
 import ChatSection from '../chat/chatSection'
+import ElectronAid from '../../electron'
+import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 
 import "./index.less";
+
 class ImMain extends Component {
+  constructor(props) {
+    super(props);
+    this.state= {}
+  }
+  
+  componentDidMount(){
+    console.log(ElectronAid)
+    if(ElectronAid){
+      ElectronAid.mainIsReady()
+      ElectronAid.mainInitWs(initWS)
+    }
+  }
+
   render() {
     return (
       <div id="im-main">

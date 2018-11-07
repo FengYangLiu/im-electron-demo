@@ -16,6 +16,7 @@ import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 
 // action 统一管理
 import { getSendMsgAction, getLoginUserInfoAction } from '../../store/actionCreators';
+import ElectronAid from '../../electron'
 
 import "./index.less";
 // import "./index.css";
@@ -49,9 +50,14 @@ class LoginMain extends Component {
         console.log("发送的变量: ", values);
         this.props.handleActionUserLogin(values);
         this.setLoginState(true);
-        initWS(()=>{
-          this.setLoginState(false);
-        });
+        // if(ElectronAid){
+
+        //   ElectronAid.loginToMainSync(window.IM_WS)
+        // }else{
+          initWS(()=>{
+            this.setLoginState(false);
+          });
+        // }
       }
     });
   };
@@ -152,9 +158,6 @@ class LoginMain extends Component {
               )}
             </FormItem>
             <FormItem>
-              {/* <Row>
-                <Col span={24} style={{ textAlign: "right" }}> */}
-                  {/* <div className="button-wrap"> */}
                     <Button
                       type="primary"
                       htmlType="submit"
@@ -162,62 +165,10 @@ class LoginMain extends Component {
                     >
                       登录
                     </Button>
-                    {/* <Button
-                      type="danger"
-                      className="login-form-button"
-                      onClick={this.handleOutLogin}
-                    >
-                      退出
-                    </Button> */}
-                  {/* </div> */}
-                {/* </Col>
-              </Row> */}
             </FormItem>
           </Form>
         </div>
         </Spin>
-
-        {/* <TextArea
-          rows="3"
-          value={msgText}
-          onChange={value => {
-            this.handleChangeMsgText(value);
-          }}
-        />
-        <div style={{ textAlign: "right" }}>
-          <Input
-            placeholder="输入接收者"
-            style={{ width: "70%" }}
-            prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
-            value={tagetUser}
-            onChange={this.onChangeUserName}
-          />
-          <Button onClick={this.sendMsg} icon="message">
-            发送
-          </Button>
-
-          <div className="chatList">
-            {this.props.chatList.map((item, index) => (
-              <Card style={{ width: 300, marginTop: 16 }} key={index}>
-                <Meta
-                  avatar={
-                    <Avatar
-                      style={{
-                        backgroundColor: `${
-                          item.name === "admin" ? "#7265e6" : "#00a2ae"
-                        }`
-                      }}
-                      icon="user"
-                    />
-                  }
-                  title={item.name}
-                  description={item.msg}
-                />
-              </Card>
-            ))}
-          </div>
-        </div>
-      */}
       </div>
     );
   }

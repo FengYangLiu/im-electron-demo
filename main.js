@@ -35,11 +35,20 @@ function initMainWindow() {
 // 初始化 从主进程到渲染进程的异步通信。
 function initIpc() {
 	// 打开主窗口回调
-	ipcMain.on('ipcOpenMainWindow',() => {
+	ipcMain.on('ipcOpenMainWindow',(options) => {
+		// console.log(options)
 		if(mainWindow){ // 实例存在则弹出
 			mainWindow.show()
 		}else{// 不存在则初始化，如login转到main
 			initMainWindow();
+		}
+	})
+
+	// 登陆到主界面
+	ipcMain.on('ipcMainIsReady', (ops)=>{
+		if(mainWindow){ // 实例存在则弹出
+			mainWindow.show()
+			mainWindow.webContents.send('ipcInitWs',{})
 		}
 	})
 }
@@ -47,8 +56,10 @@ function initIpc() {
 // 创建 login窗口
 function createLoginWindow() {
 	loginWindow = new BrowserWindow({
-		width: 300,
-		height: 350,
+		// width: 300,
+		// height: 350,
+		width: 1000,
+		height: 700,
 		frame: false, // 边框菜单设置
 		show: true,
 		transparent: true
@@ -57,7 +68,7 @@ function createLoginWindow() {
 	
 	// 窗口加载网址
 	loginWindow.loadURL('http://localhost:3000/');
-	// loginWindow.webContents.openDevTools()
+	loginWindow.webContents.openDevTools()
 
 	loginWindow.on('closed', function () {
 		loginWindow = null
@@ -84,7 +95,7 @@ function createWindow() {
 	//   mainWindow.loadFile('index.html')
 
 	// 开启调试窗口
-	//   mainWindow.webContents.openDevTools()
+	  mainWindow.webContents.openDevTools()
 
 	// 监听按键
 	mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -92,10 +103,15 @@ function createWindow() {
 			mainWindow.webContents.toggleDevTools()
 		}
 	  })
+
 	
+
 	// 创建后初显示 更优雅的显示(官方标注，减少白屏)
 	mainWindow.on('ready-to-show', () => {
 		if(mainWindow) mainWindow.show();
+
+		// 重新
+		mainWindow.webContents.send('ipcInitWs',{})
 	})
 
 	// Emitted when the window is closed.
