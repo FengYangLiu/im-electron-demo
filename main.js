@@ -56,10 +56,10 @@ function initIpc() {
 // 创建 login窗口
 function createLoginWindow() {
 	loginWindow = new BrowserWindow({
-		// width: 300,
-		// height: 350,
-		width: 1000,
-		height: 700,
+		width: 300,
+		height: 350,
+		// width: 1000,
+		// height: 700,
 		frame: false, // 边框菜单设置
 		show: true,
 		transparent: true
@@ -68,7 +68,7 @@ function createLoginWindow() {
 	
 	// 窗口加载网址
 	loginWindow.loadURL('http://localhost:3000/');
-	loginWindow.webContents.openDevTools()
+	// loginWindow.webContents.openDevTools()
 
 	loginWindow.on('closed', function () {
 		loginWindow = null
@@ -95,7 +95,7 @@ function createWindow() {
 	//   mainWindow.loadFile('index.html')
 
 	// 开启调试窗口
-	  mainWindow.webContents.openDevTools()
+	//   mainWindow.webContents.openDevTools()
 
 	// 监听按键
 	mainWindow.webContents.on('before-input-event', (event, input) => {
