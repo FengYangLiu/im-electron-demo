@@ -55,7 +55,19 @@ class ChatSection extends Component {
 
     return (
       <div id="im-chat-section">
-        <div className="section-top">头部</div>
+        <div className="section-top">
+          <div className="section-top-left">
+            <div className="section-top_left-username">
+              lfy
+            </div> 
+            <div className="section-top_left-userText">
+              ssssss
+            </div>
+          </div>
+          <div>
+            图标
+          </div>
+        </div>
         <div className="section-center">
           {chatList.map(item => (
             <div className={`message-content ${item.type?'me':''}`}>

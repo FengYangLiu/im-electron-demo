@@ -1,13 +1,38 @@
 .im-chat {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 0 0 10px 2px rgb(238, 237, 237);
+    border-radius: 5px;
     .chat-left-list {
-        width: 300px;
-        height: 100%;
-        border-right: 1px solid #ccc;
         display: flex;
+        width: 100%;
+        height: 100%;
+        // border-right: 1px solid #ccc;
+        // background-color:#fff;
         flex-direction: column;
+        .chat-top-wrap{
+            padding: 0 10px;
+        }
         .chat-top {
-			border-bottom: 1px solid #ccc;
-			height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 55px;
+            
+            // border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid rgb(245, 244, 244);
+            color: rgb(48,148,198);
+            font-size: 16px;
+            font-weight: 500;
+            .chat-title-send{
+                padding: 3px 5px;
+                background: rgb(41,154,214);
+                color: #fff;
+                border-radius: 5px;
+                font-size: 14px;
+                font-weight: normal;
+            }
         }
         .user-list {
             display: flex;
@@ -16,8 +41,11 @@
             display: flex;
             align-items: center;
             padding: 8px 10px;
-            border-bottom: 1px solid #ccc;
+            // border-bottom: 1px solid #ccc;
             width: 100%;
+            &:hover{
+                background-color: rgb(238,239,241);
+            }
             .item-img {
                 flex-basis: 50px;
             }
@@ -25,9 +53,16 @@
                 flex-grow: 1;
                 display: flex;
                 flex-direction: column; // background: red;
+                color: #3e4149;
                 .item-content-top {
                     display: flex;
                     justify-content: space-between;
+                    .item-time{
+                        color: #ccc;
+                    }
+                }
+                .item-text{
+                    color:#ccc;
                 }
             }
             .item-title {

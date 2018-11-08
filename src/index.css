@@ -7,3 +7,18 @@ html,body{
 #root{
   height: 100%;
 }
+
+a{
+  color: #c3c3c3;
+  list-style: none;
+}
+a:hover{
+  color: #fff;
+}
+a:active{
+  list-style: none;
+}
+a:focus{
+  list-style: none;
+  text-decoration:none;
+}

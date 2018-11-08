@@ -27,7 +27,14 @@ class ImMain extends Component {
   render() {
     return (
       <div id="im-main">
-        <div className="im-main-nav">顶层</div>
+        <div className="im-main-nav">
+          <div className="nav-img">
+
+          </div>
+          <span className="nav-title">
+            &lt;西湖基础管控--及时支援平台&gt;
+          </span>
+        </div>
         <div className="im-main_content">
           <div className="main-left_nav-wrap">
             <Link to="/chat">
@@ -37,13 +44,17 @@ class ImMain extends Component {
               <Icon className="item-icon" type="user" theme="outlined" />
             </Link>
           </div>
-          <Switch>
-            <Route path="/chat" render={() => <ImChat />} />
-            <Route path="/userList" component={ImUserList} />
-          </Switch>
-          <Switch>
-            <Route path="/chat/:id" render={() => (<ChatSection/>)} ></Route>
-          </Switch>
+          <div className="main-chat-nav">
+            <Switch>
+              <Route path="/chat" render={() => <ImChat />} />
+              <Route path="/userList" component={ImUserList} />
+            </Switch>
+          </div>
+          <div className="mian-chat-content">
+            <Switch>
+              <Route path="/chat/:id" render={() => (<ChatSection/>)} ></Route>
+            </Switch>
+          </div>
         </div>
       </div>
     );

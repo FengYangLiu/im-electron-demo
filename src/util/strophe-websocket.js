@@ -93,7 +93,9 @@ function linkCallback(status, cb) {
 
 // 初始化strophe 的 websocket 
 function initWS(cb) {
-	LOGIN_USER_INFO = JSON.parse(localStorage.LOGIN_USER_INFO)
+	if(localStorage.LOGIN_USER_INFO){
+		LOGIN_USER_INFO = JSON.parse(localStorage.LOGIN_USER_INFO)
+	}
 	if (LOGIN_USER_INFO.username) {
 		localStorage.setItem('LOGIN_USER_INFO',JSON.stringify(LOGIN_USER_INFO))
 		//OpenFire是实现了WebSocket的子协议

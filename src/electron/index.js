@@ -19,7 +19,7 @@
 		 let Elec =  require('./initElectron').default
 		return new Elec();
 	 }
-	 return {}
+	 return ''
  }
 
  export default checkElectron()

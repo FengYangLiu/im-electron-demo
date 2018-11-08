@@ -10,9 +10,13 @@ class ImChat extends Component{
 		return (
 			<div className="im-chat">
 				<div className="chat-left-list" >
-					<div className="chat-top">
-						会话
-						<div>发起会话</div>
+					<div className="chat-top-wrap">
+						<div className="chat-top">
+							<span className="">
+								会话
+							</span>
+							<div className="chat-title-send">发起会话</div>
+						</div>
 					</div>
 					{/* <div className="user-list"> */}
 						<Link className="user-list" to="/chat/12">
