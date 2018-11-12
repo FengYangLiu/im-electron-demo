@@ -8,7 +8,8 @@
 import {
 	IM_SEND_MSG,
 	IM_LOGIN_USER_INFO,
-	IM_OPEN_ID
+	IM_OPEN_ID,
+	IM_FACE_CHANGE
 } from './actionTypes';
 
 /**
@@ -35,5 +36,14 @@ export const getSendMsgAction = (value) => ({
  */
 export const hadleSendMsgAction = (value) => ({
 	type:IM_OPEN_ID,
+	value
+})
+
+/**
+ * 表情
+ * @param {String} value openid
+ */
+export const hadleFaceChangeAction = (value) => ({
+	type:IM_FACE_CHANGE,
 	value
 })

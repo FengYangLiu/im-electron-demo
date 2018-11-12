@@ -1,24 +1,34 @@
 import React, { Component } from "react";
-import { Input, Button, Avatar } from "antd";
+import { Input, Button, Avatar, Popover, Tabs } from "antd";
 import "./index.less";
 
+import Face from '../../components/Face'
+import {oldFaceSize} from '../../components/Face/FaceSection/faceSize'
 // websocket 暴露接口
 import { imSendMsg } from "../../../util/strophe-websocket";
 
 // action 统一管理
-import { getSendMsgAction } from "../../../store/actionCreators";
+import { 
+  getSendMsgAction,
+  hadleFaceChangeAction
+ } from "../../../store/actionCreators";
 
 import { connect } from "react-redux";
 
 const { TextArea } = Input;
+const TabPane = Tabs.TabPane;
+const IM_FACE_TIME = '';
+let that;
 
 class ChatSection extends Component {
   constructor(props) {
     super(props);
+    that = this;
     this.state = {
       msgText: "",
       tagetUser: "admin",
-      chatList: []
+      chatList: [],
+      visible: false,
     };
   }
   // 修改发送文本
@@ -38,19 +48,53 @@ class ChatSection extends Component {
      */
     let info = {
       to: tagetUser,
-	  msg: msgText,
-	};
-	
-    imSendMsg(info,()=>{
-		// 调用store触发redux
-		this.props.handleActionSendMsg(msgText);
-	});
+      msg: msgText,
+    };
+
+    imSendMsg(info, () => {
+      // 调用store触发redux
+      this.props.handleActionSendMsg(msgText);
+    });
     this.setState({
       msgText: ""
     });
   };
+
+  state = {
+
+  }
+
+  hide = () => {
+    this.setState({
+      visible: false,
+    });
+  }
+
+  handleVisibleChange = (visible) => {
+    this.setState({ visible });
+  }
+  handleFaceTextChange = (text)=>{
+    const tempText = this.state.msgText+text
+    this.setState({msgText:tempText})
+  }
+
+  handleTansformChat = (str) => {
+    str = str.replace(/</g, '&lt;');
+    str = str.replace(/>/g, '&gt;');
+    str = str.replace(/(\n|\r\n)/g, '<br/>');
+    str = str.replace(/\s/g, '&nbsp;');
+
+    const reg = /\[old_(\d*)+\]/g;
+    //   <div>
+    //   sdasdas<div className='im-face old-face' style={{backgroundPositionX:-4,backgroundPositionY:-4}}></div>
+    // </div>
+    str = str.replace(reg,(word,w1,w2) => `<div class='im-face old-face' style="background-position:${oldFaceSize[w1].backgroundX}px ${oldFaceSize[w1].backgroundY}px"></div>`)
+    let tempStr = `<div>${str}</div>`;
+    return tempStr;
+  }
+
   render() {
-	  const {chatList } = this.props;
+    const { chatList } = this.props;
     const { msgText } = this.state;
 
     return (
@@ -59,7 +103,7 @@ class ChatSection extends Component {
           <div className="section-top-left">
             <div className="section-top_left-username">
               lfy
-            </div> 
+            </div>
             <div className="section-top_left-userText">
               ssssss
             </div>
@@ -69,8 +113,8 @@ class ChatSection extends Component {
           </div>
         </div>
         <div className="section-center">
-          {chatList.map(item => (
-            <div className={`message-content ${item.type?'me':''}`}>
+          {chatList.map((item,index) => (
+            <div className={`message-content ${item.type ? 'me' : ''}`} key={index}>
               <div className='message-avatar-wrap'>
                 <Avatar
                   style={{
@@ -79,10 +123,15 @@ class ChatSection extends Component {
                   }}
                   size="large"
                 >
-                 {item.name}
+                  {item.name}
                 </Avatar>
               </div>
-              <div className="message-text">{item.msg}</div>
+              <div className="message-text" dangerouslySetInnerHTML={{__html:this.handleTansformChat(item.msg)}}></div>
+              {/* <div className="message-text" >
+                  <div>
+                    sdasdas<div className='im-face old-face' style={{backgroundPositionX:-4,backgroundPositionY:-4}}></div>
+                  </div>
+              </div> */}
             </div>
           ))}
           {/* <div className="message-content">
@@ -109,6 +158,23 @@ class ChatSection extends Component {
           </div> */}
         </div>
         <div className="section-bottom">
+          <div className="bottom-nav_top">
+            <Popover
+              content={
+                // <a onClick={this.hide}>Close</a>
+                <Face></Face>
+
+              }
+              // title="Title"
+              trigger="click"
+              visible={this.state.visible}
+              onVisibleChange={this.handleVisibleChange}
+            >
+              <Button icon="smile" theme="outlined"></Button>
+            </Popover>
+
+            {/* <Icon type="smile" theme="outlined" /> */}
+          </div>
           <TextArea
             className="section-text"
             rows={5}
@@ -130,8 +196,14 @@ class ChatSection extends Component {
 // 映射 state 至 props
 const mapStateToProps = state => {
   console.log(state);
+  if(state.IM_FACE_TEXT.faceStr && IM_FACE_TIME !== state.IM_FACE_TEXT.time){
+    console.log('点击了表情')
+    that.handleFaceTextChange(state.IM_FACE_TEXT.faceStr)
+    that.props.handleActionFaceChange('')
+  }
   return {
-    chatList: state.chatList
+    chatList: state.chatList,
+    face_text: state.IM_FACE_TEXT
   };
 };
 
@@ -142,13 +214,19 @@ const mapDispatchToProps = dispatch => {
     handleActionSendMsg: msg => {
       // 添加一个动作
       const action = getSendMsgAction({
-		name: "lfy1",
-		type:1,
+        name: "lfy1",
+        type: 1,
         msg
       });
       // 发送动作
       dispatch(action);
-    }
+    },
+    handleActionFaceChange: (faceStr='')=>{
+      console.log(faceStr)
+    const time = new Date().getTime()
+    const action = hadleFaceChangeAction({faceStr,time})
+    dispatch(action);
+  }
   };
 };
 export default connect(

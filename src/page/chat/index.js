@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import './index.less'
 import { Avatar } from 'antd';
 
@@ -18,8 +18,7 @@ class ImChat extends Component{
 							<div className="chat-title-send">发起会话</div>
 						</div>
 					</div>
-					{/* <div className="user-list"> */}
-						<Link className="user-list" to="/chat/12">
+						<NavLink activeClassName="user-list-active"  className="user-list" to="/chat/12">
 						<div className="list-item">
 							<div className="item-img">
 								<Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }} size="large">
@@ -40,8 +39,29 @@ class ImChat extends Component{
 								</p>
 							</div>
 						</div>
-					</Link> 
-					{/* </div> */}
+					</NavLink> 
+					<NavLink activeClassName="user-list-active"  className="user-list" to="/chat/13">
+						<div className="list-item">
+							<div className="item-img">
+								<Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }} size="large">
+									more
+								</Avatar>
+							</div>
+							<div className="item-content">
+								<div className="item-content-top">
+									<span className="item-title">
+										jerry、lfy、admin等人
+									</span>
+									<span className="item-time">
+										15:22
+									</span>
+								</div>
+								<p className="item-text">
+									多人聊天
+								</p>
+							</div>
+						</div>
+					</NavLink> 
 				</div>
 
 			</div>

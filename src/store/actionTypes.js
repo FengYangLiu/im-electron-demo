@@ -19,3 +19,6 @@ export const IM_LOGIN_USER_INFO = 'im_login_user_info';
 
 // 发送信息
 export const IM_SEND_MSG = 'im_send_msg';
+
+// 点击表情后座的触发
+export const IM_FACE_CHANGE = 'im_face_change';

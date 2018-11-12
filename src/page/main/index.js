@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, BrowserRouter, Link, Switch } from "react-router-dom";
+import { Route, BrowserRouter, Link, Switch, NavLink } from "react-router-dom";
 import { Icon } from "antd";
 
 import ImChat from "../chat";
@@ -37,12 +37,12 @@ class ImMain extends Component {
         </div>
         <div className="im-main_content">
           <div className="main-left_nav-wrap">
-            <Link to="/chat">
+            <NavLink to="/chat" activeClassName="main-left_nav-active">
               <Icon className="item-icon" type="message" theme="outlined" />
-            </Link>
-            <Link to="/userList">
+            </NavLink>
+            <NavLink to="/userList" activeClassName="main-left_nav-active">
               <Icon className="item-icon" type="user" theme="outlined" />
-            </Link>
+            </NavLink>
           </div>
           <div className="main-chat-nav">
             <Switch>

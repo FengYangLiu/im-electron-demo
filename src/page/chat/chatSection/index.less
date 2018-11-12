@@ -45,14 +45,30 @@
                     background-color: rgb(41,154,214);
                     color: #fff;
 				}	
-			}
+            }
+            .im-face{
+                width: 22px;
+                height: 22px;
+                display: inline-block;
+                vertical-align: bottom;
+                &.old-face{
+                    background: url(../../../images/faceIcon/oldFace.png) no-repeat;
+                }
+            }
 		}
     }
     .section-bottom {
-        border-top: 1px solid #ccc; // height: 180px;
+        // border-top: 1px solid #ccc; // height: 180px;
+        box-shadow: 0 0 5px 1px rgb(204, 204, 204);
+        border-radius: 5px;
+        background-color: #fff; 
+        .bottom-nav_top{
+            padding: 3px 5px;
+            font-size: 16px;
+        }
         .section-text {}
         .section-button-box {
-			padding: 10px; 
+			padding: 5px; 
             text-align: right;
         }
     }

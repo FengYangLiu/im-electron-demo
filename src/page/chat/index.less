@@ -7,27 +7,24 @@
     .chat-left-list {
         display: flex;
         width: 100%;
-        height: 100%;
-        // border-right: 1px solid #ccc;
+        height: 100%; // border-right: 1px solid #ccc;
         // background-color:#fff;
         flex-direction: column;
-        .chat-top-wrap{
+        .chat-top-wrap {
             padding: 0 10px;
         }
         .chat-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 55px;
-            
-            // border-bottom: 1px solid #ccc;
+            height: 55px; // border-bottom: 1px solid #ccc;
             border-bottom: 1px solid rgb(245, 244, 244);
-            color: rgb(48,148,198);
+            color: rgb(48, 148, 198);
             font-size: 16px;
             font-weight: 500;
-            .chat-title-send{
+            .chat-title-send {
                 padding: 3px 5px;
-                background: rgb(41,154,214);
+                background: rgb(41, 154, 214);
                 color: #fff;
                 border-radius: 5px;
                 font-size: 14px;
@@ -37,14 +34,16 @@
         .user-list {
             display: flex;
         }
+        .user-list-active {
+            background-color: rgb(238, 239, 241);
+        }
         .list-item {
             display: flex;
             align-items: center;
-            padding: 8px 10px;
-            // border-bottom: 1px solid #ccc;
+            padding: 8px 10px; // border-bottom: 1px solid #ccc;
             width: 100%;
-            &:hover{
-                background-color: rgb(238,239,241);
+            &:hover {
+                background-color: rgb(238, 239, 241);
             }
             .item-img {
                 flex-basis: 50px;
@@ -57,12 +56,12 @@
                 .item-content-top {
                     display: flex;
                     justify-content: space-between;
-                    .item-time{
+                    .item-time {
                         color: #ccc;
                     }
                 }
-                .item-text{
-                    color:#ccc;
+                .item-text {
+                    color: #ccc;
                 }
             }
             .item-title {
