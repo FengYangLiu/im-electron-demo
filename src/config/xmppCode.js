@@ -22,5 +22,6 @@ export const IQ_TYPE = {
  * chat, groupchat
  */
 export const MASSAGE_TYPE = {
-    CHAT:'chat'
+    CHAT:'chat',
+    GROUP_CHAT:'groupchat'
 }

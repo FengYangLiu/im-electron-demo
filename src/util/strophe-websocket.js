@@ -7,7 +7,11 @@
 
 import store from '../store/index.js';
 import { IM_CHAT_MODULE_TYPE } from '../config/code';
-import { SPACE_PING,IQ_TYPE } from '../config/xmppCode'; // xmpp命名空间文件
+import { 
+	SPACE_PING,
+	IQ_TYPE,
+	MASSAGE_TYPE
+ } from '../config/xmppCode'; // xmpp命名空间文件
 
 import {
 	getSendMsgAction,
@@ -161,7 +165,16 @@ function initWS(cb) {
 		let type = msg.getAttribute('type');
 		let elems = msg.getElementsByTagName('body');
 
-		if (type === "chat" && elems.length > 0) { // 获取消息
+		if (type === MASSAGE_TYPE.CHAT && elems.length > 0) { // 单聊获取消息
+			let body = elems[0];
+			const send_msg_name = from.split('@')[0];
+			const send_msg_text = Strophe.getText(body);
+			let msg = {
+				name: send_msg_name,
+				msg: send_msg_text
+			};
+			handleStoreGetMsg(msg)
+		}else if(type === MASSAGE_TYPE.GROUP_CHAT && elems.length > 0){// 群聊
 			let body = elems[0];
 			const send_msg_name = from.split('@')[0];
 			const send_msg_text = Strophe.getText(body);
@@ -201,59 +214,40 @@ function initWS(cb) {
 				alert("请输入联系人！");
 				return;
 			}
+			let chatType = MASSAGE_TYPE.CHAT;
 			
 			// 群组的话需要加入群聊才能聊天
 			if(info.type === IM_CHAT_MODULE_TYPE.GROUP) {// 如果是群组的话
 				/**
-				 * 群聊协议
+				 * 加入群聊协议
 				 * <presence from='xxg@host' to='xxgroom@muc.host/xxg'>
 				 *		<x xmlns='http://jabber.org/protocol/muc'/>
 				 *	</presence>
-				 *
-				 *<iq from='hag66@shakespeare.lit/pda'
-						id='getnick1'
-						to='coven@chat.shakespeare.lit'
-						type='get'>
-					<query xmlns='http://jabber.org/protocol/disco#info'
-							node='x-roomuser-item'/>
-					</iq>
 				 */
-				let iqEle = StropheJS.$iq({
-					from:window.IM_WS.authzid,
-					to: info.to,
-					id: IM_OPEN_ID,
-					type:'get'
-				}).c('query',{
-					xmlns:'http://jabber.org/protocol/disco#info',
-					node:'x-roomuser-item'
-				}, null).tree();
+				chatType = MASSAGE_TYPE.GROUP_CHAT;
+				
 
-				window.IM_WS.sendIQ(iqEle,()=>{
-					let sendEle = StropheJS.$pres({
-						from: `${window.IM_WS.authzid}/${window.IM_WS.authcid}`,
-						to: info.to,
-						id: IM_OPEN_ID
-					}).c('x',{xmlns:'http://jabber.org/protocol/muc'},null)
-					.tree()
-					window.IM_WS.send(sendEle)
-				},(e)=>{
-					console.log(e)
-				})
+				let sendEle = StropheJS.$pres({
+					from: window.IM_WS.authzid,
+					to: `${info.to}/${window.IM_WS.authcid}`,
+					id: IM_OPEN_ID
+				}).c('x',{xmlns:'http://jabber.org/protocol/muc'},null)
+				.tree()
+				window.IM_WS.send(sendEle)
 
 				
-			}else{
+			}
 				// 创建一个<message>元素并发送
 				let msg = StropheJS.$msg({
 					to: info.to,
 					from: window.IM_WS.authzid,
-					type: 'chat'
+					type: chatType
 				}).c("body", null, info.msg);
-				window.IM_WS.sendPresence(msg.tree(), (evt) => {
+					window.IM_WS.sendPresence(msg.tree(), (evt) => {
 					console.log(evt)
 				}, (err) => {
 					cb&&cb()
-				}, 1000);
-			}
+				}, 500);
 		} else {
 			alert("请先登录！");
 		}

@@ -103,7 +103,25 @@ class ChatSection extends Component {
   }
 
   componentDidMount() {
-
+    if (this.props.match.params.id === '13') {
+      this.setState({
+        tagetUser: `group@conference.${IM_SERVE.hostname}`,
+        chatUserInfo: {
+          name: '多人聊天',
+          headerText: '群聊',
+          type: IM_CHAT_MODULE_TYPE.GROUP
+        }
+      })
+    } else {
+      this.setState({
+        tagetUser: `admin@${IM_SERVE.hostname}`,
+        chatUserInfo: {
+          name: 'admin',
+          headerText: '管理员',
+          type: IM_CHAT_MODULE_TYPE.SINGLE
+        }
+      })
+    }
   }
 
   componentWillReceiveProps(next) {
