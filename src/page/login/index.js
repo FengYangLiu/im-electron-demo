@@ -5,7 +5,7 @@
  * @Last Modified time: 2018-11-01 14:33:27
  */
 import React, { Component } from "react";
-import { Form, Icon, Input, Button, Card, Spin, Avatar, Row, Col } from "antd";
+import { Form, Icon, Input, Button, Spin} from "antd";
 import WindowHandle from '../components/WindowHandle';
 
 import store from "../../store/index.js";
@@ -16,14 +16,12 @@ import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 
 // action 统一管理
 import { getSendMsgAction, getLoginUserInfoAction } from '../../store/actionCreators';
-import ElectronAid from '../../electron'
+// import ElectronAid from '../../electron'
 
 import "./index.less";
 // import "./index.css";
 
 const FormItem = Form.Item;
-const { TextArea } = Input;
-const { Meta } = Card;
 
 class LoginMain extends Component {
   constructor(props) {
@@ -115,7 +113,7 @@ class LoginMain extends Component {
   }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { tagetUser, msgText, logging } = this.state;
+    const { logging } = this.state;
 
     return (
       <div id="im-login">
@@ -177,7 +175,6 @@ class LoginMain extends Component {
 const WrappedLoginMain = Form.create()(LoginMain);
 // 映射 state 至 props
 const mapStateToProps = (state) => {
-  console.log(state)
   return {
     chatList: state.chatList
   }

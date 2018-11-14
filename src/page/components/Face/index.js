@@ -30,7 +30,6 @@ class Face extends Component{
 
 
     onSelectFaceFn = (faceStr, index) => {
-        console.log(faceStr, index)
         this.props.handleActionFaceChange(faceStr)
     }
     
@@ -60,7 +59,6 @@ class Face extends Component{
 }
 // 映射 state 至 props
 const mapStateToProps = state => {
-    console.log(state);
     return {
     //   chatList: state.chatList
     };
@@ -70,7 +68,6 @@ const mapStateToProps = state => {
   const mapDispatchToProps = dispatch => {
     return {
       handleActionFaceChange: (faceStr)=>{
-          console.log(faceStr)
         const time = new Date().getTime()
         const action = hadleFaceChangeAction({faceStr,time})
         dispatch(action);

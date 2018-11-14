@@ -36,7 +36,6 @@ export default (state = defaultState, action) => {
 		// 深拷贝一个state
 		const newState = JSON.parse(JSON.stringify(state))
 		newState.chatList.push(action.value)
-		console.log(newState)
 		return newState;
 	} else if (action.type === IM_LOGIN_USER_INFO) {
 		const newState = JSON.parse(JSON.stringify(state))

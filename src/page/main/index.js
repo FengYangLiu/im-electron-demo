@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { Route, BrowserRouter, Link, Switch, NavLink } from "react-router-dom";
+import { Route, Switch, NavLink } from "react-router-dom";
 import { Icon } from "antd";
 
 import ImChat from "../chat";
 import ImUserList from "../userList";
 import ChatSection from '../chat/chatSection'
 import ElectronAid from '../../electron'
-import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
+import { initWS,} from "../../util/strophe-websocket";
 
 import "./index.less";
 
@@ -17,7 +17,7 @@ class ImMain extends Component {
   }
   
   componentDidMount(){
-    console.log(ElectronAid)
+    // console.log(ElectronAid)
     if(ElectronAid){
       ElectronAid.mainIsReady()
       ElectronAid.mainInitWs(initWS)

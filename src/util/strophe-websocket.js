@@ -6,6 +6,8 @@
  */
 
 import store from '../store/index.js';
+import { IM_CHAT_MODULE_TYPE } from '../config/code';
+import { SPACE_PING,IQ_TYPE } from '../config/xmppCode'; // xmpp命名空间文件
 
 import {
 	getSendMsgAction,
@@ -57,9 +59,9 @@ function linkCallback(status, cb) {
 		let steam = StropheJS.$pres({
 				id: IM_OPEN_ID,
 			})
-			.c('status', {}, 'Online')
-			.c('show', {}, 'Online')
-			.c('priority', {}, '1')
+			.c('status', {}, '请勿打扰')
+			.c('show', {}, '请勿打扰')
+			.c('priority', {}, '0')
 			.tree();
 			window.IM_WS.send(steam)
 
@@ -75,11 +77,21 @@ function linkCallback(status, cb) {
 			console.log("连接成功，可以开始聊天了！");
 			if (cb) cb()
 
+			let domain = Strophe.getDomainFromJid(window.IM_WS.jid)
+			// 发送一个ping
+			onSendPing(domain)
+
 			// 当接收到<message>节，调用onMessage回调函数
-			window.IM_WS.addHandler(onMessage, null, 'message', null, null, null);
+			window.IM_WS.addHandler(onMessage, null, 'message');
+
+			// 当接收到iq,并且是该命名空间的ping，调用handleGetPing回调函数 
+			window.IM_WS.addHandler(handleGetPing, null, 'iq', 'ping1');
 
 			// 首先要发送一个<presence>给服务器（initial presence）
 			window.IM_WS.send(StropheJS.$pres().tree());
+
+			// 为IM增加日志监听
+			Strophe.log = handleLogger;
 
 			// 对窗口通讯打开主窗口
 			if (ElectronAid.openMainWindow) { // 存在则打开窗口不存在则跳转路由
@@ -161,6 +173,20 @@ function initWS(cb) {
 		}
 		return true;
 	}
+	
+	/**
+	 * 处理ping的回调函数
+	 * @param {Element} iqEle iq回调
+	 */
+	function handleGetPing(iqEle) {
+		let from = iqEle.getAttribute('from');
+		let type = iqEle.getAttribute('type');
+		let elems = iqEle.getElementsByTagName('body');
+		const pong = StropheJS.$iq({
+
+		})
+		return false;
+	}
 
 	//  发送消息
 	function imSendMsg(info, cb) {
@@ -175,18 +201,59 @@ function initWS(cb) {
 				alert("请输入联系人！");
 				return;
 			}
+			
+			// 群组的话需要加入群聊才能聊天
+			if(info.type === IM_CHAT_MODULE_TYPE.GROUP) {// 如果是群组的话
+				/**
+				 * 群聊协议
+				 * <presence from='xxg@host' to='xxgroom@muc.host/xxg'>
+				 *		<x xmlns='http://jabber.org/protocol/muc'/>
+				 *	</presence>
+				 *
+				 *<iq from='hag66@shakespeare.lit/pda'
+						id='getnick1'
+						to='coven@chat.shakespeare.lit'
+						type='get'>
+					<query xmlns='http://jabber.org/protocol/disco#info'
+							node='x-roomuser-item'/>
+					</iq>
+				 */
+				let iqEle = StropheJS.$iq({
+					from:window.IM_WS.authzid,
+					to: info.to,
+					id: IM_OPEN_ID,
+					type:'get'
+				}).c('query',{
+					xmlns:'http://jabber.org/protocol/disco#info',
+					node:'x-roomuser-item'
+				}, null).tree();
 
-			// 创建一个<message>元素并发送
-			let msg = StropheJS.$msg({
-				to: `${info.to}@${window.IM_WS.domain}`,
-				from: window.IM_WS.authzid,
-				type: 'chat'
-			}).c("body", null, info.msg);
-			window.IM_WS.sendPresence(msg.tree(), (evt) => {
-				console.log(evt)
-			}, (err) => {
-				cb&&cb()
-			}, 1000);
+				window.IM_WS.sendIQ(iqEle,()=>{
+					let sendEle = StropheJS.$pres({
+						from: `${window.IM_WS.authzid}/${window.IM_WS.authcid}`,
+						to: info.to,
+						id: IM_OPEN_ID
+					}).c('x',{xmlns:'http://jabber.org/protocol/muc'},null)
+					.tree()
+					window.IM_WS.send(sendEle)
+				},(e)=>{
+					console.log(e)
+				})
+
+				
+			}else{
+				// 创建一个<message>元素并发送
+				let msg = StropheJS.$msg({
+					to: info.to,
+					from: window.IM_WS.authzid,
+					type: 'chat'
+				}).c("body", null, info.msg);
+				window.IM_WS.sendPresence(msg.tree(), (evt) => {
+					console.log(evt)
+				}, (err) => {
+					cb&&cb()
+				}, 1000);
+			}
 		} else {
 			alert("请先登录！");
 		}
@@ -212,6 +279,40 @@ function initWS(cb) {
 	function handleStoreToOpenId(value) {
 		const action = hadleSendMsgAction(value)
 		store.dispatch(action)
+	}
+	
+	// 日志监听
+	function handleLogger(level, msg){
+		// level
+		const logLevelInfo = {
+			0: '[DEBUG] 调试输出:',
+			1: '[INFO] 信息输出:',
+			2: '[WARN] 警告:',
+			3: '[ERROR] 错误:',
+			4: '[FATAL] 致命错误:'
+		}
+		console.log(`${logLevelInfo[level]} ${msg}`)
+	}
+
+	/**
+	 * 发送ping
+	 * @param {String} to 发送给谁
+	 */
+	function onSendPing(to){
+		/* 
+		<iq from='juliet@capulet.lit/balcony' to='capulet.lit' id='c2s1' type='get'>
+		<ping xmlns='urn:xmpp:ping'/>
+		</iq> 
+		*/
+		const ping = StropheJS.$iq({
+			to,
+			type: IQ_TYPE.GET,
+			id: 'ping1'
+		}).c('ping',{xmlns:SPACE_PING},null).tree();
+
+		console.log(`[start_time:${new Date().toLocaleString()}] Ping to: ${to}`);
+
+		window.IM_WS.send(ping)
 	}
 
 	export {
