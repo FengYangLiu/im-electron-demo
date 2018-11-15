@@ -65,7 +65,7 @@
     "test": "node scripts/test.js",
     "e-start": "electron .",
     "package": "electron-packager .",
-    "package-win": "electron-packager . win-package --win --overwrite --out ../installaction-package --ignore=./gitignore"
+    "package-all": "electron-packager ./ win-package --all --overwrite --out ../installaction-package --ignore=./gitignore"
   },
   "eslintConfig": {
     "extends": "react-app"
