@@ -22,3 +22,6 @@ export const IM_SEND_MSG = 'im_send_msg';
 
 // 点击表情后座的触发
 export const IM_FACE_CHANGE = 'im_face_change';
+
+// 获取用户列表
+export const IM_USER_LIST = 'im_user_list'

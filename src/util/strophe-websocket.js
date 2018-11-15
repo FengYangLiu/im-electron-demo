@@ -10,12 +10,14 @@ import { IM_CHAT_MODULE_TYPE } from '../config/code';
 import { 
 	SPACE_PING,
 	IQ_TYPE,
-	MASSAGE_TYPE
+	MASSAGE_TYPE,
+	SPACE_IQ_ROSTER
  } from '../config/xmppCode'; // xmpp命名空间文件
 
 import {
 	getSendMsgAction,
-	hadleSendMsgAction
+	hadleSendMsgAction,
+	hadleChangeUserListAction
 } from '../store/actionCreators'
 
 import ElectronAid from '../electron'
@@ -84,7 +86,10 @@ function linkCallback(status, cb) {
 			let domain = Strophe.getDomainFromJid(window.IM_WS.jid)
 			// 发送一个ping
 			onSendPing(domain)
-
+			
+			//  获取花名册
+			getChatUserList()
+			
 			// 当接收到<message>节，调用onMessage回调函数
 			window.IM_WS.addHandler(onMessage, null, 'message');
 
@@ -192,12 +197,12 @@ function initWS(cb) {
 	 * @param {Element} iqEle iq回调
 	 */
 	function handleGetPing(iqEle) {
-		let from = iqEle.getAttribute('from');
-		let type = iqEle.getAttribute('type');
-		let elems = iqEle.getElementsByTagName('body');
-		const pong = StropheJS.$iq({
+		// let from = iqEle.getAttribute('from');
+		// let type = iqEle.getAttribute('type');
+		// let elems = iqEle.getElementsByTagName('body');
+		// const pong = StropheJS.$iq({
 
-		})
+		// })
 		return false;
 	}
 
@@ -270,9 +275,48 @@ function initWS(cb) {
 		store.dispatch(action);
 	}
 
+	// Store 获取最初的ID
 	function handleStoreToOpenId(value) {
 		const action = hadleSendMsgAction(value)
 		store.dispatch(action)
+	}
+
+	/**
+	 * 获取用户列表
+	 */
+	function handleChangeUserList(value){
+		const action = hadleChangeUserListAction(value)
+		store.dispatch(action)
+	}
+
+	// 请求花名册（用户列表）
+	function getChatUserList(){
+		let iqEle = StropheJS.$iq({
+			from: window.IM_WS.authzid,
+			type: IQ_TYPE.GET,
+			id: 'roster'
+		}).c("query", { xmlns: SPACE_IQ_ROSTER }, null).tree();
+			window.IM_WS.sendIQ(iqEle,(iq)=>{
+				let itemEle = iq.querySelectorAll('item');
+				let itemArr = [];
+				itemEle.forEach((item,index)=>{
+					const itemAttr = item.getAttributeNames();
+					let itemAttrObj = {};
+					 itemAttr.map(name => 
+						itemAttrObj[name] = item.getAttribute(name)
+					)
+					const groupEle = item.querySelector('group');
+					const groupText = groupEle.innerHTML 
+					const obj = {...itemAttrObj,groupName:groupText};
+					itemArr.push(obj)
+				})
+				
+				// 发送消息
+				handleChangeUserList(itemArr);
+				console.log(itemArr)
+			},(e)=>{
+				console.log(`err: ${e}`)
+			})
 	}
 	
 	// 日志监听

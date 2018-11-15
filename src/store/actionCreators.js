@@ -9,7 +9,8 @@ import {
 	IM_SEND_MSG,
 	IM_LOGIN_USER_INFO,
 	IM_OPEN_ID,
-	IM_FACE_CHANGE
+	IM_FACE_CHANGE,
+	IM_USER_LIST
 } from './actionTypes';
 
 /**
@@ -20,6 +21,17 @@ export const getLoginUserInfoAction = (value) => ({
 	type:IM_LOGIN_USER_INFO,
 	value
 })
+
+
+/**
+ * 获取用户列表（花名册）信息
+ * @param {Object} value 登陆用户信息包含（username和password）
+ */
+export const hadleChangeUserListAction = (value) => ({
+	type:IM_USER_LIST,
+	value
+})
+
 
 /**
  * 获取发送消息的action

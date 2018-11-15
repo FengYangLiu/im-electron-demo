@@ -5,6 +5,7 @@ import { Icon } from "antd";
 import ImChat from "../chat";
 import ImUserList from "../userList";
 import ChatSection from '../chat/chatSection'
+import UserListSection from '../userList/userListSection'
 import ElectronAid from '../../electron'
 import { initWS,} from "../../util/strophe-websocket";
 
@@ -53,6 +54,7 @@ class ImMain extends Component {
           <div className="mian-chat-content">
             <Switch>
               <Route path="/chat/:id" render={() => (<ChatSection/>)} ></Route>
+              <Route path="/userList/:id" render={() => (<UserListSection/>)} ></Route>
             </Switch>
           </div>
         </div>

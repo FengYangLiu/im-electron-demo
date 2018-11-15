@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import './index.less'
 import { Avatar } from 'antd';
@@ -7,6 +8,7 @@ import { Avatar } from 'antd';
 
 class ImChat extends Component{
 	render(){
+		const { userList } = this.props
 		return (
 			<div className="im-chat">
 				<div className="chat-left-list" >
@@ -69,4 +71,21 @@ class ImChat extends Component{
 	}
 }
 
-export default ImChat;
+// 映射 state 至 props
+const mapStateToProps = state => {
+	return {
+	  userList: state.userList
+	};
+  };
+  
+  // store.dispatch, props
+  const mapDispatchToProps = dispatch => {
+	return {
+
+	};
+  };
+  const tempConnect = connect(
+	mapStateToProps,
+	mapDispatchToProps
+  )(ImChat);
+export default tempConnect;
