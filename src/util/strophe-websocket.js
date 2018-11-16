@@ -6,13 +6,16 @@
  */
 
 import store from '../store/index.js';
-import { IM_CHAT_MODULE_TYPE } from '../config/code';
-import { 
+import {
+	IM_CHAT_MODULE_TYPE
+} from '../config/code';
+import {
 	SPACE_PING,
 	IQ_TYPE,
 	MASSAGE_TYPE,
-	SPACE_IQ_ROSTER
- } from '../config/xmppCode'; // xmpp命名空间文件
+	SPACE_IQ_ROSTER,
+	PRESENCE_TYPE
+} from '../config/xmppCode'; // xmpp命名空间文件
 
 import {
 	getSendMsgAction,
@@ -37,7 +40,7 @@ const port = IM_SERVE.port;
 const host = IM_HOST;
 
 // store 统一
-let LOGIN_USER_INFO = store.getState().LOGIN_USER_INFO ;
+let LOGIN_USER_INFO = store.getState().LOGIN_USER_INFO;
 let IM_OPEN_ID = store.getState().IM_OPEN_ID;
 // let IM_WS = null
 // window.IM_WS=null;
@@ -69,7 +72,7 @@ function linkCallback(status, cb) {
 			.c('show', {}, '请勿打扰')
 			.c('priority', {}, '0')
 			.tree();
-			window.IM_WS.send(steam)
+		window.IM_WS.send(steam)
 
 		if (status === Strophe.Status.CONNECTING) {
 			console.log("连接中！");
@@ -86,10 +89,10 @@ function linkCallback(status, cb) {
 			let domain = Strophe.getDomainFromJid(window.IM_WS.jid)
 			// 发送一个ping
 			onSendPing(domain)
-			
+
 			//  获取花名册
 			getChatUserList()
-			
+
 			// 当接收到<message>节，调用onMessage回调函数
 			window.IM_WS.addHandler(onMessage, null, 'message');
 
@@ -112,17 +115,19 @@ function linkCallback(status, cb) {
 	}
 }
 
-// 初始化strophe 的 websocket 
+/**
+ * 初始化strophe 的 websocket
+ * @param {Function} cb 回调
+ */
 function initWS(cb) {
-	if(localStorage.LOGIN_USER_INFO){
+	if (localStorage.LOGIN_USER_INFO) {
 		LOGIN_USER_INFO = JSON.parse(localStorage.LOGIN_USER_INFO)
 	}
 	if (LOGIN_USER_INFO.username) {
-		localStorage.setItem('LOGIN_USER_INFO',JSON.stringify(LOGIN_USER_INFO))
+		localStorage.setItem('LOGIN_USER_INFO', JSON.stringify(LOGIN_USER_INFO))
 		//OpenFire是实现了WebSocket的子协议
 		let connection = new Strophe.Connection(host, {
 			protocol: 'ws',
-			port,
 			sync: true
 		});
 
@@ -130,231 +135,291 @@ function initWS(cb) {
 
 		// 监听用于接收进入连接的XML数据
 		window.IM_WS.xmlInput = getImXMLRespone;
-			const connectParam = [
-				`${LOGIN_USER_INFO.username}@${hostname}`, // JID
-				`${LOGIN_USER_INFO.password}`, // password
-				(status) => {
-					linkCallback(status, cb) // 连接后的回调
-				}
-			]
 
-			window.IM_WS.connect(...connectParam)
-		}
+		const connectParam = [
+			`${LOGIN_USER_INFO.username}@${hostname}`, // JID
+			`${LOGIN_USER_INFO.password}`, // password
+			(status) => {
+				linkCallback(status, cb) // 连接后的回调
+			}
+		]
+
+		window.IM_WS.connect(...connectParam)
+	}
+}
+
+/**
+ * 监听用于接收进入连接的XML数据
+ * @param {Element} xml 返回的xml
+ */
+function getImXMLRespone(xml) {
+	let nodeName = xml.nodeName;
+	if (nodeName === 'open') {
+		getOpenId(xml)
+	}
+}
+
+
+// 接收 <open> 获取uid
+function getOpenId(ele) {
+	let openId = ele.getAttribute('id');
+	if (openId && openId !== IM_OPEN_ID) {
+		handleStoreToOpenId(openId)
 	}
 
-	/**
-	 * 监听用于接收进入连接的XML数据
-	 * @param {Element} xml 返回的xml
-	 */
-	function getImXMLRespone(xml) {
-		let nodeName = xml.nodeName;
-		if (nodeName === 'open') {
-			getOpenId(xml)
-		}
+}
+
+// 接收到<message> 的回调
+function onMessage(msg) {
+	// 解析出<message>的from、type属性，以及body子元素
+	let from = msg.getAttribute('from');
+	let type = msg.getAttribute('type');
+	let elems = msg.getElementsByTagName('body');
+
+	if (type === MASSAGE_TYPE.CHAT && elems.length > 0) { // 单聊获取消息
+		let body = elems[0];
+		const send_msg_name = from.split('@')[0];
+		const send_msg_text = Strophe.getText(body);
+		let msg = {
+			name: send_msg_name,
+			msg: send_msg_text
+		};
+		handleStoreGetMsg(msg)
+	} else if (type === MASSAGE_TYPE.GROUP_CHAT && elems.length > 0) { // 群聊
+		let body = elems[0];
+		const send_msg_name = from.split('@')[0];
+		const send_msg_text = Strophe.getText(body);
+		let msg = {
+			name: send_msg_name,
+			msg: send_msg_text
+		};
+		handleStoreGetMsg(msg)
 	}
+	return true;
+}
+
+/**
+ * 处理ping的回调函数
+ * @param {Element} iqEle iq回调
+ */
+function handleGetPing(iqEle) {
+	// let from = iqEle.getAttribute('from');
+	// let type = iqEle.getAttribute('type');
+	// let elems = iqEle.getElementsByTagName('body');
+	// const pong = StropheJS.$iq({
+
+	// })
+	return false;
+}
 
 
-	// 接收 <open> 获取uid
-	function getOpenId(ele) {
-		let openId = ele.getAttribute('id');
-		if (openId && openId !== IM_OPEN_ID) {
-			handleStoreToOpenId(openId)
-		}
-
+/**
+ * 发送消息
+ * @param {Object} info data
+ * @param {Function} cb 回调
+ */
+function imSendMsg(info, cb) {
+	if (!window.IM_WS) {
+		// alert("请输入联系人！");
+		window.location.hash = '#/'
+		return;
 	}
-
-	// 接收到<message> 的回调
-	function onMessage(msg) {
-		// 解析出<message>的from、type属性，以及body子元素
-		let from = msg.getAttribute('from');
-		let type = msg.getAttribute('type');
-		let elems = msg.getElementsByTagName('body');
-
-		if (type === MASSAGE_TYPE.CHAT && elems.length > 0) { // 单聊获取消息
-			let body = elems[0];
-			const send_msg_name = from.split('@')[0];
-			const send_msg_text = Strophe.getText(body);
-			let msg = {
-				name: send_msg_name,
-				msg: send_msg_text
-			};
-			handleStoreGetMsg(msg)
-		}else if(type === MASSAGE_TYPE.GROUP_CHAT && elems.length > 0){// 群聊
-			let body = elems[0];
-			const send_msg_name = from.split('@')[0];
-			const send_msg_text = Strophe.getText(body);
-			let msg = {
-				name: send_msg_name,
-				msg: send_msg_text
-			};
-			handleStoreGetMsg(msg)
-		}
-		return true;
-	}
-	
-	/**
-	 * 处理ping的回调函数
-	 * @param {Element} iqEle iq回调
-	 */
-	function handleGetPing(iqEle) {
-		// let from = iqEle.getAttribute('from');
-		// let type = iqEle.getAttribute('type');
-		// let elems = iqEle.getElementsByTagName('body');
-		// const pong = StropheJS.$iq({
-
-		// })
-		return false;
-	}
-
-	//  发送消息
-	function imSendMsg(info, cb) {
-		if (!window.IM_WS) {
-			// alert("请输入联系人！");
-			window.location.hash = '#/'
+	let connected = window.IM_WS.connected || false
+	if (connected) {
+		if (!info.to) {
+			alert("请输入联系人！");
 			return;
 		}
-		let connected = window.IM_WS.connected || false
-		if (connected) {
-			if (!info.to) {
-				alert("请输入联系人！");
-				return;
-			}
-			let chatType = MASSAGE_TYPE.CHAT;
-			
-			// 群组的话需要加入群聊才能聊天
-			if(info.type === IM_CHAT_MODULE_TYPE.GROUP) {// 如果是群组的话
-				/**
-				 * 加入群聊协议
-				 * <presence from='xxg@host' to='xxgroom@muc.host/xxg'>
-				 *		<x xmlns='http://jabber.org/protocol/muc'/>
-				 *	</presence>
-				 */
-				chatType = MASSAGE_TYPE.GROUP_CHAT;
-				
+		let chatType = MASSAGE_TYPE.CHAT;
 
-				let sendEle = StropheJS.$pres({
+		// 群组的话需要加入群聊才能聊天
+		if (info.type === IM_CHAT_MODULE_TYPE.GROUP) { // 如果是群组的话
+			/**
+			 * 加入群聊协议
+			 * <presence from='xxg@host' to='xxgroom@muc.host/xxg'>
+			 *		<x xmlns='http://jabber.org/protocol/muc'/>
+			 *	</presence>
+			 */
+			chatType = MASSAGE_TYPE.GROUP_CHAT;
+
+
+			let sendEle = StropheJS.$pres({
 					from: window.IM_WS.authzid,
 					to: `${info.to}/${window.IM_WS.authcid}`,
 					id: IM_OPEN_ID
-				}).c('x',{xmlns:'http://jabber.org/protocol/muc'},null)
+				}).c('x', {
+					xmlns: 'http://jabber.org/protocol/muc'
+				}, null)
 				.tree()
-				window.IM_WS.send(sendEle)
+			window.IM_WS.send(sendEle)
 
-				
-			}
-				// 创建一个<message>元素并发送
-				let msg = StropheJS.$msg({
-					to: info.to,
-					from: window.IM_WS.authzid,
-					type: chatType
-				}).c("body", null, info.msg);
-					window.IM_WS.sendPresence(msg.tree(), (evt) => {
-					console.log(evt)
-				}, (err) => {
-					cb&&cb()
-				}, 500);
-		} else {
-			alert("请先登录！");
+
 		}
-	}
-
-	// 登出回调
-	function outLogin() {
-		let steam = StropheJS.$build('close', {
-				xmlns: "urn:ietf:params:xml:ns:xmpp-framing"
-			})
-			.tree();
-			window.IM_WS.send(steam)
-	}
-
-	// 获取消息回调
-	function handleStoreGetMsg(value) {
-		// 一个行为
-		const action = getSendMsgAction(value)
-		// 发送动作
-		store.dispatch(action);
-	}
-
-	// Store 获取最初的ID
-	function handleStoreToOpenId(value) {
-		const action = hadleSendMsgAction(value)
-		store.dispatch(action)
-	}
-
-	/**
-	 * 获取用户列表
-	 */
-	function handleChangeUserList(value){
-		const action = hadleChangeUserListAction(value)
-		store.dispatch(action)
-	}
-
-	// 请求花名册（用户列表）
-	function getChatUserList(){
-		let iqEle = StropheJS.$iq({
+		// 创建一个<message>元素并发送
+		let msg = StropheJS.$msg({
+			to: info.to,
 			from: window.IM_WS.authzid,
-			type: IQ_TYPE.GET,
-			id: 'roster'
-		}).c("query", { xmlns: SPACE_IQ_ROSTER }, null).tree();
-			window.IM_WS.sendIQ(iqEle,(iq)=>{
-				let itemEle = iq.querySelectorAll('item');
-				let itemArr = [];
-				itemEle.forEach((item,index)=>{
-					const itemAttr = item.getAttributeNames();
-					let itemAttrObj = {};
-					 itemAttr.map(name => 
+			type: chatType
+		}).c("body", null, info.msg);
+		window.IM_WS.sendPresence(msg.tree(), (evt) => {
+			console.log(evt)
+		}, (err) => {
+			cb && cb()
+		}, 500);
+	} else {
+		alert("请先登录！");
+	}
+}
+
+// 登出回调
+function outLogin() {
+	let steam = StropheJS.$build('close', {
+			xmlns: "urn:ietf:params:xml:ns:xmpp-framing"
+		})
+		.tree();
+	window.IM_WS.send(steam)
+}
+
+/**
+ * 获取消息回调
+ * redux action
+ */
+function handleStoreGetMsg(value) {
+	// 一个行为
+	const action = getSendMsgAction(value)
+	// 发送动作
+	store.dispatch(action);
+}
+
+/** 
+ * Store 获取最初的ID
+ * reudx action
+ */
+function handleStoreToOpenId(value) {
+	const action = hadleSendMsgAction(value)
+	store.dispatch(action)
+}
+
+/**
+ * 获取用户列表
+ * redux action 
+ */
+function handleChangeUserList(value) {
+	const action = hadleChangeUserListAction(value)
+	store.dispatch(action)
+}
+
+/**
+ * 请求花名册（用户列表）
+ */
+function getChatUserList() {
+	let iqEle = StropheJS.$iq({
+		from: window.IM_WS.authzid,
+		type: IQ_TYPE.GET,
+		id: 'roster'
+	}).c("query", {
+		xmlns: SPACE_IQ_ROSTER
+	}, null).tree();
+	window.IM_WS.sendIQ(iqEle, (iq) => {
+		let itemEle = iq.querySelectorAll('item');
+		let itemArr = [];
+		itemEle.forEach((item, index) => {
+			const itemAttr = item.getAttributeNames();
+			let itemAttrObj = {};
+				if(itemAttr.indexOf('ask')<= 0){
+					itemAttr.map(name =>{
 						itemAttrObj[name] = item.getAttribute(name)
-					)
-					const groupEle = item.querySelector('group');
-					const groupText = groupEle.innerHTML 
-					const obj = {...itemAttrObj,groupName:groupText};
-					itemArr.push(obj)
 				})
-				
-				// 发送消息
-				handleChangeUserList(itemArr);
-				console.log(itemArr)
-			},(e)=>{
-				console.log(`err: ${e}`)
-			})
+			}
+			const groupEle = item.querySelector('group');
+			let obj = { ...itemAttrObj};
+			if(groupEle){ // 容错处理，获取列表的时候会获取 用户列表和好友请求消息
+				// <item jid="lfy3@192.168.201.231" ask="subscribe" subscription="none"/>
+				const groupText = groupEle.innerHTML
+				obj = {...obj,groupName: groupText}
+				// 好友请求消息
+			}
+			if(Object.keys(obj).length>0){
+				itemArr.push(obj)
+			}
+		})
+
+		// 发送消息
+		handleChangeUserList(itemArr);
+		console.log(itemArr)
+	}, (e) => {
+		console.log(`err: ${e}`)
+	})
+
+}
+
+// 日志监听
+function handleLogger(level, msg) {
+	// level
+	const logLevelInfo = {
+		0: '[DEBUG] 调试输出:',
+		1: '[INFO] 信息输出:',
+		2: '[WARN] 警告:',
+		3: '[ERROR] 错误:',
+		4: '[FATAL] 致命错误:'
 	}
+	console.log(`${logLevelInfo[level]} ${msg}`)
+}
+
+/**
+ * 发送ping
+ * @param {String} to 发送给谁
+ */
+function onSendPing(to) {
+	/* 
+	<iq from='juliet@capulet.lit/balcony' to='capulet.lit' id='c2s1' type='get'>
+	<ping xmlns='urn:xmpp:ping'/>
+	</iq> 
+	*/
+	const ping = StropheJS.$iq({
+		to,
+		type: IQ_TYPE.GET,
+		id: 'ping1'
+	}).c('ping', {
+		xmlns: SPACE_PING
+	}, null).tree();
+
+	console.log(`[start_time:${new Date().toLocaleString()}] Ping to: ${to}`);
+
+	window.IM_WS.send(ping)
+}
+
+function imAddFriend(jid){
+/* <iq id ='a78b4q6ha463'to ='juliet @ 
+       example.com/chamber'type 
+       ='set'> 
+    <query xmlns ='jabber：iq：roster'> 
+      <item jid='nurse@example.com'/ > 
+    </ query> 
+  </ iq> */
+    const toJid = `${jid}@${hostname}`
+	const iqEle = StropheJS.$iq({type: IQ_TYPE.SET})
+	.c('query',{xmlns:SPACE_IQ_ROSTER},null)
+	.c('item',{jid:toJid})
+	.tree();
+
+	window.IM_WS.sendIQ(iqEle,(iq)=>{
+		console.log(`增加好友成功：`)
+		console.log(iq)
+		console.log('刷新用户列表');
+		const subscribePre = StropheJS.$pres({to:toJid, type:PRESENCE_TYPE.SUBSCRIBE}).tree()
+		window.IM_WS.send(subscribePre);
+		getChatUserList()
+	},(err)=>{
+		console.log(`增加好友失败：${err}`)
+	})
+
 	
-	// 日志监听
-	function handleLogger(level, msg){
-		// level
-		const logLevelInfo = {
-			0: '[DEBUG] 调试输出:',
-			1: '[INFO] 信息输出:',
-			2: '[WARN] 警告:',
-			3: '[ERROR] 错误:',
-			4: '[FATAL] 致命错误:'
-		}
-		console.log(`${logLevelInfo[level]} ${msg}`)
-	}
+}
 
-	/**
-	 * 发送ping
-	 * @param {String} to 发送给谁
-	 */
-	function onSendPing(to){
-		/* 
-		<iq from='juliet@capulet.lit/balcony' to='capulet.lit' id='c2s1' type='get'>
-		<ping xmlns='urn:xmpp:ping'/>
-		</iq> 
-		*/
-		const ping = StropheJS.$iq({
-			to,
-			type: IQ_TYPE.GET,
-			id: 'ping1'
-		}).c('ping',{xmlns:SPACE_PING},null).tree();
-
-		console.log(`[start_time:${new Date().toLocaleString()}] Ping to: ${to}`);
-
-		window.IM_WS.send(ping)
-	}
-
-	export {
-		initWS,
-		imSendMsg,
-		outLogin
-	}
+export {
+	initWS,
+	imSendMsg,
+	outLogin,
+	imAddFriend
+}
