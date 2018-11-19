@@ -20,6 +20,27 @@ class ImChat extends Component{
 							<div className="chat-title-send">发起会话</div>
 						</div>
 					</div>
+					<NavLink activeClassName="user-list-active"  className="user-list user-inform " to="/chat/inform">
+						<div className="list-item border-bottom">
+							<div className="item-img">
+								<Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }} size="large">
+									通知
+								</Avatar>
+							</div>
+							<div className="item-content">
+								<div className="item-content-top">
+									<span className="item-title">
+										通知
+									</span>
+									<span className="item-time">
+
+									</span>
+								</div>
+								<p className="item-text">
+								</p>
+							</div>
+						</div>
+					</NavLink> 
 						<NavLink activeClassName="user-list-active"  className="user-list" to="/chat/12">
 						<div className="list-item">
 							<div className="item-img">

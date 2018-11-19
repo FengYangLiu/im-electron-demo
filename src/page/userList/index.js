@@ -63,6 +63,14 @@ class ImUserList extends Component {
 		});
 	}
 
+	transformlastTowChat = (item) => {
+		if(!item.name){
+			return item.name = '数据有误'
+		}else{
+		return item.name.substr(item.name.length - 2, item.name.length)
+		}
+	}
+
 	render() {
 		const {
 			userList
@@ -87,7 +95,7 @@ class ImUserList extends Component {
 						<NavLink to={`/userList/${item.name}`}
 							className="user-list-item" >
 							<div className="user-img" >
-								{ item.name.substr(item.name.length - 2, item.name.length)} 
+								{ } 
 							</div> 
 							<div className="user-name" > 
 								{ item.name} 

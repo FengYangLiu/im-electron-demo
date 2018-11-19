@@ -68,13 +68,13 @@ function createLoginWindow() {
 
 	
 	// 窗口加载网址
-	loginWindow.loadURL(url.format({
-		pathname: path.join(__dirname, './build/index.html'),
-		protocol: 'file:',
-		slashes: true
-	  }))
+	// loginWindow.loadURL(url.format({
+	// 	pathname: path.join(__dirname, './build/index.html'),
+	// 	protocol: 'file:',
+	// 	slashes: true
+	//   }))
 
-	// loginWindow.loadURL('http://localhost:3000/');
+	loginWindow.loadURL('http://localhost:3000/');
 	// loginWindow.webContents.openDevTools()
 
 	loginWindow.on('closed', function () {
@@ -94,14 +94,14 @@ function createWindow() {
 		show: false // 是否显示
 	})
 
-	mainWindow.loadURL(url.format({
-		pathname: path.join(__dirname, './build/index.html'),
-		protocol: 'file:',
-		hash:'#/chat',
-		slashes: true
-	  }))
+	// mainWindow.loadURL(url.format({
+	// 	pathname: path.join(__dirname, './build/index.html'),
+	// 	protocol: 'file:',
+	// 	hash:'#/chat',
+	// 	slashes: true
+	//   }))
 	// 窗口加载网址
-	// mainWindow.loadURL('http://localhost:3000/#/chat');             
+	mainWindow.loadURL('http://localhost:3000/#/chat');             
 
 	//  and load the index.html of the app.
 	//   mainWindow.loadFile('index.html')

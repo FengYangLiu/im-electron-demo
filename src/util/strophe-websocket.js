@@ -14,13 +14,15 @@ import {
 	IQ_TYPE,
 	MASSAGE_TYPE,
 	SPACE_IQ_ROSTER,
-	PRESENCE_TYPE
+	PRESENCE_TYPE,
+	ITEM_SUB_TYPE
 } from '../config/xmppCode'; // xmpp命名空间文件
 
 import {
 	getSendMsgAction,
 	hadleSendMsgAction,
-	hadleChangeUserListAction
+	hadleChangeUserListAction,
+	hadleChangeUserInformListAction
 } from '../store/actionCreators'
 
 import ElectronAid from '../electron'
@@ -310,6 +312,15 @@ function handleChangeUserList(value) {
 }
 
 /**
+ * 获取好友请求列表
+ * redux action 
+ */
+function handleChangeUserInformList(value) {
+	const action = hadleChangeUserInformListAction(value)
+	store.dispatch(action)
+}
+
+/**
  * 请求花名册（用户列表）
  */
 function getChatUserList() {
@@ -323,29 +334,47 @@ function getChatUserList() {
 	window.IM_WS.sendIQ(iqEle, (iq) => {
 		let itemEle = iq.querySelectorAll('item');
 		let itemArr = [];
+		let askItem = [];
 		itemEle.forEach((item, index) => {
 			const itemAttr = item.getAttributeNames();
 			let itemAttrObj = {};
+			let askAttrObj ={}
 				if(itemAttr.indexOf('ask')<= 0){
+					const subscription = item.getAttribute('subscription')
+					if(subscription===ITEM_SUB_TYPE.to || subscription===ITEM_SUB_TYPE.BOTH){
+						// 订阅或者被订阅
+						itemAttr.map(name => itemAttrObj[name] = item.getAttribute(name))
+
+						if(itemAttr.indexOf('name') <= 0){
+							itemAttrObj['name'] = itemAttrObj['jid'].split('@')[0];
+						}
+					}
+
+				}else{
 					itemAttr.map(name =>{
-						itemAttrObj[name] = item.getAttribute(name)
-				})
-			}
+						askAttrObj[name] = item.getAttribute(name)
+					})	
+				}
 			const groupEle = item.querySelector('group');
 			let obj = { ...itemAttrObj};
+			let askObj = {...askAttrObj}
 			if(groupEle){ // 容错处理，获取列表的时候会获取 用户列表和好友请求消息
 				// <item jid="lfy3@192.168.201.231" ask="subscribe" subscription="none"/>
 				const groupText = groupEle.innerHTML
 				obj = {...obj,groupName: groupText}
 				// 好友请求消息
 			}
+
 			if(Object.keys(obj).length>0){
 				itemArr.push(obj)
+			}else if(Object.keys(askObj).length>0){
+				askItem.push(askObj);
 			}
 		})
 
 		// 发送消息
 		handleChangeUserList(itemArr);
+		handleChangeUserInformList(askItem);
 		console.log(itemArr)
 	}, (e) => {
 		console.log(`err: ${e}`)
@@ -409,7 +438,7 @@ function imAddFriend(jid){
 		console.log('刷新用户列表');
 		const subscribePre = StropheJS.$pres({to:toJid, type:PRESENCE_TYPE.SUBSCRIBE}).tree()
 		window.IM_WS.send(subscribePre);
-		getChatUserList()
+		// getChatUserList()
 	},(err)=>{
 		console.log(`增加好友失败：${err}`)
 	})
@@ -417,9 +446,30 @@ function imAddFriend(jid){
 	
 }
 
+
+function imAddFriendSub(subObj){
+	// const toJid = `${jid}@${hostname}`
+	const preEle = StropheJS.$pres({
+		type: PRESENCE_TYPE.SUBSCRIBED,
+		to: subObj.jid
+	})
+	.tree();
+
+	window.IM_WS.sendPresence(preEle,(pre)=>{
+		console.log(`订阅好友成功：`)
+		console.log('刷新用户列表');
+		subObj.success&&subObj.success()
+		getChatUserList()
+	},(err)=>{
+		subObj.error&&subObj.error()
+		console.log(`增加好友失败：${err}`)
+	})
+}
+
 export {
 	initWS,
 	imSendMsg,
 	outLogin,
-	imAddFriend
+	imAddFriend,
+	imAddFriendSub
 }

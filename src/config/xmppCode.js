@@ -42,10 +42,12 @@ export const IQ_TYPE = {
 
 /**
  * presence type：
- * subscript: 订阅
+ * subscribed: 订阅
+ * unsubscribed: 拒绝订阅
  */
 export const PRESENCE_TYPE = {
-    SUBSCRIBE:'subscribe'
+    SUBSCRIBED:'subscribed',
+    UNSUBSCRIBED: 'unsubscribed'
 }
 
 /**

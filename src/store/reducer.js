@@ -3,7 +3,8 @@ import {
 	IM_SEND_MSG,
 	IM_OPEN_ID,
 	IM_FACE_CHANGE,
-	IM_USER_LIST
+	IM_USER_LIST,
+	IM_USER_INFORM_LIST
 } from './actionTypes';
 
 // 默认数据
@@ -15,6 +16,7 @@ const defaultState = {
 		password: ''
 	},
 	userList:[],
+	userInformList:[],
 	chatList: [{
 			name: 'lfy1',
 			msg: 'hello',
@@ -54,6 +56,10 @@ export default (state = defaultState, action) => {
 	} else if(action.type === IM_USER_LIST){ // 用户列表
 		const newState = JSON.parse(JSON.stringify(state))
 		newState.userList = action.value;
+		return newState;
+	} else if(action.type === IM_USER_INFORM_LIST){ // 用户请求通知列表
+		const newState = JSON.parse(JSON.stringify(state))
+		newState.userInformList = action.value;
 		return newState;
 	}
 	return state
