@@ -5,9 +5,8 @@
  * @Last Modified time: 2018-11-01 14:33:27
  */
 import React, { Component } from "react";
-import { Form, Icon, Input, Button, Spin} from "antd";
+import { Form, Icon, Input, Button, Spin, Tabs } from "antd";
 import WindowHandle from '../components/WindowHandle';
-
 import store from "../../store/index.js";
 import { connect } from 'react-redux';
 
@@ -16,12 +15,14 @@ import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
 
 // action 统一管理
 import { getSendMsgAction, getLoginUserInfoAction } from '../../store/actionCreators';
-// import ElectronAid from '../../electron'
+import ElectronAid from '../../electron'
 
 import "./index.less";
+import img_qr from '../../images/QRcode.png'
 // import "./index.css";
 
 const FormItem = Form.Item;
+const TabPane = Tabs.TabPane;
 
 class LoginMain extends Component {
   constructor(props) {
@@ -111,6 +112,11 @@ class LoginMain extends Component {
       logging:state
     })
   }
+  
+  handleChangeTab = (key) => {
+
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { logging } = this.state;
@@ -118,54 +124,71 @@ class LoginMain extends Component {
     return (
       <div id="im-login">
         <Spin size="large" spinning={logging} delay='200'>
-        <div className="im-login-title">
-          <WindowHandle/>
-          <span className="im-login_title-text">IM'LOGIN</span>
-        </div>
-        <div className="im-login-content">
-          <Form onSubmit={this.handleSubmit} className="login-form">
-            <FormItem>
-              {getFieldDecorator("username", {
-                rules: [
-                  { required: true, message: "请输入用户名" }
-                ],
-                initialValue: "lfy1"
-              })(
-                <Input
-                  prefix={
-                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  placeholder="Username"
-                />
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator("password", {
-                rules: [
-                  { required: true, message: "请输入密码" }
-                ],
-                initialValue: "lfy1"
-              })(
-                <Input
-                  prefix={
-                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  type="password"
-                  placeholder="Password"
-                />
-              )}
-            </FormItem>
-            <FormItem>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      className="login-form-button"
-                    >
-                      登录
-                    </Button>
-            </FormItem>
-          </Form>
-        </div>
+        { ElectronAid ? 
+          (<div className="top-window">
+            <span className="top-title">
+              IM
+            </span>
+
+            <WindowHandle/> 
+          </div>)
+        : null }
+        <Tabs className="tab-login" defaultActiveKey="1" onChange={this.handleChangeTab}>
+          <TabPane tab="密码登录" key="1">
+            <div className="im-login-title">
+              <span className="im-login_title-text">IM'LOGIN</span>
+            </div>
+            <div className="im-login-content">
+              <Form onSubmit={this.handleSubmit} className="login-form">
+                <FormItem>
+                  {getFieldDecorator("username", {
+                    rules: [
+                      { required: true, message: "请输入用户名" }
+                    ],
+                    initialValue: "lfy1"
+                  })(
+                    <Input
+                      prefix={
+                        <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                      }
+                      placeholder="Username"
+                    />
+                  )}
+                </FormItem>
+                <FormItem>
+                  {getFieldDecorator("password", {
+                    rules: [
+                      { required: true, message: "请输入密码" }
+                    ],
+                    initialValue: "lfy1"
+                  })(
+                    <Input
+                      prefix={
+                        <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
+                      }
+                      type="password"
+                      placeholder="Password"
+                    />
+                  )}
+                </FormItem>
+                <FormItem>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          className="login-form-button"
+                        >
+                          登录
+                        </Button>
+                </FormItem>
+              </Form>
+            </div>
+          </TabPane>
+          <TabPane tab="扫码登录" key="2">
+              <div className="login-qr-box">
+                 <img className="login-qr" src={img_qr} alt="二维码"/> 
+              </div>
+          </TabPane>
+        </Tabs>
         </Spin>
       </div>
     );

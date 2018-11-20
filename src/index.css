@@ -4,8 +4,12 @@
 html,body{
   height: 100%;
 }
+body{
+  background: url(./images/main-bg.png) no-repeat center/cover;
+}
 #root{
-  height: 100%;
+  /* min-height: 400px; */
+  display: flex;
 }
 
 a{
