@@ -99,13 +99,22 @@ function linkCallback(status, cb) {
 			window.IM_WS.addHandler(onMessage, null, 'message');
 
 			// 当接收到iq,并且是该命名空间的ping，调用handleGetPing回调函数 
-			window.IM_WS.addHandler(handleGetPing, null, 'iq', 'ping1');
+			// window.IM_WS.addHandler(handleGetPing, null, 'iq', 'ping1');
+
+			// 监听所有的 presence
+			window.IM_WS.addHandler(handleGetPres, null, 'presence')
+
+			// 监听用户列表的改变 presence
+			window.IM_WS.addHandler(handleGetUserListChange, null, 'iq')
 
 			// 首先要发送一个<presence>给服务器（initial presence）
 			window.IM_WS.send(StropheJS.$pres().tree());
 
 			// 为IM增加日志监听
-			Strophe.log = handleLogger;
+			// Strophe.log = handleLogger;
+
+			// 15s ping一次，成功继续，失败重连
+			// window.IM_WS.addTimedHandler(5000, onSendPing)
 
 			// 对窗口通讯打开主窗口
 			if (ElectronAid.openMainWindow) { // 存在则打开窗口不存在则跳转路由
@@ -341,7 +350,7 @@ function getChatUserList() {
 			let askAttrObj ={}
 				if(itemAttr.indexOf('ask')<= 0){
 					const subscription = item.getAttribute('subscription')
-					if(subscription===ITEM_SUB_TYPE.to || subscription===ITEM_SUB_TYPE.BOTH){
+					if(subscription===ITEM_SUB_TYPE.TO || subscription===ITEM_SUB_TYPE.BOTH){
 						// 订阅或者被订阅
 						itemAttr.map(name => itemAttrObj[name] = item.getAttribute(name))
 
@@ -382,6 +391,41 @@ function getChatUserList() {
 
 }
 
+/**
+ * 监听所有的pre对象
+ * @param {Element} pres pres对象
+ */
+function handleGetPres(pres){
+	const pType = pres.getAttribute('type');
+	if(pType !== PRESENCE_TYPE.ERROR){ // 未报错
+
+	}else if(pType === PRESENCE_TYPE.UNAVAILABLE){ // 不可用状态
+
+	}else{ // 报错
+		
+	}
+	console.log(pres)
+}
+
+
+/**
+ * 监听所有用户列表变动
+ * @param {Element} iqELe iqDOM对象
+ */
+function handleGetUserListChange(iqELe){
+	console.log(iqELe)
+	// const itemDom = iqELe.querySelector('item');
+	// const sub = itemDom.getAttribute('subscription');
+
+	// if(sub !== ITEM_SUB_TYPE.REMOVE){
+
+	// }else{ // 删除用户状态 
+	// 	console.log('=================== s 用户列表状态监听 ============')
+	// 	console.log(iqELe)
+	// 	console.log('=================== e 用户列表状态监听 ============')
+	// }	
+}
+
 // 日志监听
 function handleLogger(level, msg) {
 	// level
@@ -399,7 +443,8 @@ function handleLogger(level, msg) {
  * 发送ping
  * @param {String} to 发送给谁
  */
-function onSendPing(to) {
+function onSendPing(to = IM_SERVE.hostname) {
+	console.log('ping~')
 	/* 
 	<iq from='juliet@capulet.lit/balcony' to='capulet.lit' id='c2s1' type='get'>
 	<ping xmlns='urn:xmpp:ping'/>
@@ -415,7 +460,24 @@ function onSendPing(to) {
 
 	console.log(`[start_time:${new Date().toLocaleString()}] Ping to: ${to}`);
 
-	window.IM_WS.send(ping)
+	window.IM_WS.sendIQ(ping,(iq)=>{
+		const iType = iq.getAttribute('type');
+		if(iType === IQ_TYPE.RESULT){ 
+			// code
+		}
+	},(err)=>{
+		console.log(err)
+	})
+	console.log('状态：' + window.IM_WS.connected)
+	if(window.IM_WS.connected){
+		return true;
+	}else{
+		// 删除定时器方法
+		window.IM_WS.deledeleteTimedHandler(onSendPing);
+		// 重新创建 (未测试，这里只能是网络断掉 window)
+		window.IM_WS.reset()
+		return false;
+	}
 }
 
 function imAddFriend(jid){
@@ -427,17 +489,24 @@ function imAddFriend(jid){
     </ query> 
   </ iq> */
     const toJid = `${jid}@${hostname}`
-	const iqEle = StropheJS.$iq({type: IQ_TYPE.SET})
+	const iqEle = StropheJS.$iq({
+		type: IQ_TYPE.SET,
+		id:'addFriend'
+	})
 	.c('query',{xmlns:SPACE_IQ_ROSTER},null)
-	.c('item',{jid:toJid})
+	.c('item',{
+		jid:toJid,
+		name: jid
+	})
 	.tree();
 
 	window.IM_WS.sendIQ(iqEle,(iq)=>{
-		console.log(`增加好友成功：`)
-		console.log(iq)
-		console.log('刷新用户列表');
-		const subscribePre = StropheJS.$pres({to:toJid, type:PRESENCE_TYPE.SUBSCRIBE}).tree()
-		window.IM_WS.send(subscribePre);
+		const iType = iq.getAttribute('type')
+		if(iType === IQ_TYPE.RESULT){// 成功返回
+			console.log(`增加好友成功：`)
+			const subscribePre = StropheJS.$pres({to:toJid, type:PRESENCE_TYPE.SUBSCRIBE}).tree()
+			window.IM_WS.send(subscribePre);
+		}
 		// getChatUserList()
 	},(err)=>{
 		console.log(`增加好友失败：${err}`)
@@ -448,14 +517,16 @@ function imAddFriend(jid){
 
 
 function imAddFriendSub(subObj){
+	debugger
 	// const toJid = `${jid}@${hostname}`
 	const preEle = StropheJS.$pres({
 		type: PRESENCE_TYPE.SUBSCRIBED,
-		to: subObj.jid
+		to: subObj.jid,
 	})
 	.tree();
 
 	window.IM_WS.sendPresence(preEle,(pre)=>{
+		debugger
 		console.log(`订阅好友成功：`)
 		console.log('刷新用户列表');
 		subObj.success&&subObj.success()

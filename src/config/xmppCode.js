@@ -23,7 +23,8 @@ export const ITEM_SUB_TYPE = {
     BOTH: 'both',
     TO: 'to',
     FROM: 'from',
-    NONE: 'none'
+    NONE: 'none',
+    REMOVE: 'remove'
 }
 
 
@@ -42,12 +43,18 @@ export const IQ_TYPE = {
 
 /**
  * presence type：
- * subscribed: 订阅
+ * subscribe: 订阅
+ * subscribed: 已订阅
  * unsubscribed: 拒绝订阅
+ * error: 失败
+ * UNAVAILABLE: 不可用状态
  */
 export const PRESENCE_TYPE = {
+    SUBSCRIBE: 'subscribe',
     SUBSCRIBED:'subscribed',
-    UNSUBSCRIBED: 'unsubscribed'
+    UNSUBSCRIBED: 'unsubscribed',
+    ERROR: 'error',
+    UNAVAILABLE: 'unavailable'
 }
 
 /**
