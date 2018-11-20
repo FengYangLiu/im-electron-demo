@@ -57,8 +57,8 @@ function initIpc() {
 // 创建 login窗口
 function createLoginWindow() {
 	loginWindow = new BrowserWindow({
-		width: 300,
-		height: 350,
+		width: 380,
+		height: 540,
 		// width: 1000,
 		// height: 700,
 		frame: false, // 边框菜单设置
@@ -86,8 +86,8 @@ function createLoginWindow() {
 function createWindow() {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		width: 1024,
-		height: 768,
+		width: 1000,
+		height: 602,
 		minWidth:350,
 		minHeight:350,
 		frame: false, // 边框菜单设置

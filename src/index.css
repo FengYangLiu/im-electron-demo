@@ -8,8 +8,9 @@ body{
   background: url(./images/main-bg.png) no-repeat center/cover;
 }
 #root{
-  /* min-height: 400px; */
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 a{

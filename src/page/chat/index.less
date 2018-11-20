@@ -3,47 +3,49 @@
     height: 100%;
     background-color: #fff;
     box-shadow: 0 0 10px 2px rgb(238, 237, 237);
-    border-radius: 5px;
+    border-radius: 5px 0 0 0;
+    border-right: 1px solid #e6e5e6;
     .chat-left-list {
         display: flex;
         width: 100%;
         height: 100%; // border-right: 1px solid #ccc;
         // background-color:#fff;
         flex-direction: column;
-        .chat-top-wrap {
-            padding: 0 10px;
-        }
         .chat-top {
             display: flex;
+            height: 36px;
             justify-content: space-between;
             align-items: center;
-            height: 55px; // border-bottom: 1px solid #ccc;
-            border-bottom: 1px solid rgb(245, 244, 244);
-            color: rgb(48, 148, 198);
-            font-size: 16px;
+            border-bottom: 1px solid #e6e5e6;
             font-weight: 500;
+            font-size: 12px;
+            padding: 0 14px;
+            color: #555f6a;
             .chat-title-send {
-                padding: 3px 5px;
-                background: rgb(41, 154, 214);
-                color: #fff;
-                border-radius: 5px;
-                font-size: 14px;
-                font-weight: normal;
+                height: 16px;
+                font-family: Microsoft YaHei;
+                font-size: 12px;
+                letter-spacing: 0px;
+                color: #6597f1;
             }
         }
         .user-list {
             display: flex;
+            flex-direction: column;
+            padding: 12px;
+            overflow: auto;
         }
         .user-list-active {
-            background-color: rgb(238, 239, 241);
+            background-color: #f4f6f7;
+            border-radius: 5px;
         }
         .list-item {
             display: flex;
             align-items: center;
-            padding: 8px 10px; // border-bottom: 1px solid #ccc;
+            padding: 12px;
             width: 100%;
             &:hover {
-                background-color: rgb(238, 239, 241);
+                background-color: #f4f6f7;
             }
             .item-img {
                 flex-basis: 50px;

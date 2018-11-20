@@ -123,7 +123,7 @@ class LoginMain extends Component {
 
     return (
       <div id="im-login">
-        <Spin size="large" spinning={logging} delay='200'>
+        <Spin className="im-login-spin" size="large" spinning={logging} delay='200'>
         { ElectronAid ? 
           (<div className="top-window">
             <span className="top-title">
@@ -134,9 +134,8 @@ class LoginMain extends Component {
           </div>)
         : null }
         <Tabs className="tab-login" defaultActiveKey="1" onChange={this.handleChangeTab}>
-          <TabPane tab="密码登录" key="1">
+          <TabPane className="im-login-box" tab="密码登录" key="1">
             <div className="im-login-title">
-              <span className="im-login_title-text">IM'LOGIN</span>
             </div>
             <div className="im-login-content">
               <Form onSubmit={this.handleSubmit} className="login-form">
@@ -181,11 +180,20 @@ class LoginMain extends Component {
                         </Button>
                 </FormItem>
               </Form>
+              <div className="im-login-tip">
+                网页版只支持部分功能，需配合手机使用
+              </div>
             </div>
           </TabPane>
-          <TabPane tab="扫码登录" key="2">
+          <TabPane className="im-login-box" tab="扫码登录" key="2">
               <div className="login-qr-box">
                  <img className="login-qr" src={img_qr} alt="二维码"/> 
+                 <div className="login-qr-tip">
+                  使用IM聊天手机版扫码登录
+                 </div>
+                 <div className="im-login-tip">
+                  网页版只支持部分功能，需配合手机使用
+                  </div>
               </div>
           </TabPane>
         </Tabs>

@@ -3,10 +3,22 @@
 	flex-direction: column;
 	flex: 1;
 	margin: auto;
-	height: 350px;
-	max-width: 300px;
+	height: 540px;
+	max-width: 380px;
 	border-radius: 5px;
 	background-color: #f0f5f9;
+	.im-login-spin{
+		height: 100%;
+	}
+	.im-login-tip{
+		width: 252px;
+		height: 19px;
+		font-family: Microsoft YaHei;
+		font-size: 14px;
+		line-height: 19px;
+		letter-spacing: 0px;
+		color: #c8d0d8;
+	}
 	.top-window{
 		display: flex;
 		align-items: center;
@@ -24,30 +36,47 @@
 		}
 		.login-qr-box{
 			display: flex;
+			width: 100%;
+			flex-direction: column;
 			justify-content: center;
-			align-content: center;
+			align-items: center;
+
 			.login-qr{
-				width: 200px;
-				height: 200px;
+				width: 260px;
+				height: 260px;
+				margin: 20px 0;
+			}
+			.login-qr-tip{
+				font-size: 20px;
+				padding: 10px 0;
+				color: #555f6a;
+				font-family: Microsoft YaHei;
 			}
 		}
 	}
-	.im-login-title{
+	.im-login-box{
+		display: flex;
 		width: 100%;
-
-		text-align: center;
-		padding: 5px ;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
 	}
-	.im-login_title-text{
-		font-size: 30px;
-		font-weight: bold;
+	.im-login-title{
+		width: 257px;
+		height: 75px;
+		align-content: center;
+		padding: 5px;
+		margin: 50px 0;
+		text-align: center;
+		background: url(../../images/logo/logo.png) no-repeat center/cover;
 	}
 	.login-form-button {
-		width: 100%;
-		height: 40px;
-		font-size: 18px;
-		font-weight: 500;
-		border-radius: 20px;
+		width: 257px;
+		height: 30px;
+		background-image: linear-gradient(0deg, 
+			#6597f1 0%, 
+			#3372e3 100%);
+		border-radius: 4px;
 	}
 	.im-login-content{
 		padding: 0 20px;

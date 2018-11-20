@@ -235,7 +235,7 @@ class ChatSection extends Component {
           </div>
           <TextArea
             className="section-text"
-            rows={5}
+            rows={3}
             value={msgText}
             onChange={value => {
               this.handleChangeMsgText(value);

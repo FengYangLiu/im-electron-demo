@@ -29,36 +29,50 @@ class ImMain extends Component {
   render() {
     return (
       <div id="im-main">
+
+        
         <div className="im-main-nav">
           <div className="nav-img">
 
           </div>
           <span className="nav-title">
-            &lt;西湖基础管控--及时支援平台&gt;
+            &lt;西湖基础管控&gt;及时支援平台
           </span>
         </div>
         <div className="im-main_content">
           <div className="main-left_nav-wrap">
-            <NavLink to="/chat" activeClassName="main-left_nav-active">
-              <Icon className="item-icon" type="message" theme="outlined" />
+            <NavLink className="main-nav-item" to="/chat" activeClassName="main-left_nav-active">
+              <div className="item-icon icon-nav-section"></div>
             </NavLink>
-            <NavLink to="/userList" activeClassName="main-left_nav-active">
-              <Icon className="item-icon" type="user" theme="outlined" />
+            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+              <div className="item-icon icon-nav-search"></div>
+            </NavLink>
+            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+              <div className="item-icon icon-nav-linkman"></div>
+            </NavLink>
+            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+              <div className="item-icon icon-nav-friends"></div>
+            </NavLink>
+            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+              <div className="item-icon icon-nav-setting"></div>
             </NavLink>
           </div>
-          <div className="main-chat-nav">
-            <Switch>
-              <Route path="/chat" render={() => <ImChat />} />
-              <Route path="/userList" component={ImUserList} />
-            </Switch>
-          </div>
-          <div className="mian-chat-content">
-            <Switch>
-              <Route path="/chat/inform" render={() => (<InformSection/>)} ></Route>
-              <Route path="/chat/:id" render={() => (<ChatSection/>)} ></Route>
-              <Route path="/userList/:id" render={() => (<UserListSection/>)} ></Route>
-            </Switch>
-          </div>
+          <div className="main-right">
+            <div className="main-chat-nav">
+              <Switch>
+                <Route path="/chat" component={ImChat} />
+                <Route path="/userList" component={ImUserList} />
+              </Switch>
+            </div>
+            <div className="mian-chat-content">
+              <Switch>
+                <Route path="/chat/inform" component={InformSection} />
+                <Route path="/chat/:id" component={ChatSection} />
+                <Route path="/userList/:id" component={UserListSection} />
+              </Switch>
+            </div>
+        </div>
+
         </div>
       </div>
     );
