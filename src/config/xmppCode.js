@@ -1,3 +1,14 @@
+// ====================== s XMPP DOM =======================
+export const XMPP_DOM = {
+    IQ:'iq',
+    PRESENCE: 'presence',
+    ITEM: 'item',
+    MASSAGE: 'massage'
+}
+// ====================== e XMPP DOM =======================
+
+
+
 // ============ s SPACE 以这个为开头的全是命名空间相关 =======================
 
 /* ping的命名空间 */
@@ -10,6 +21,7 @@ export const SPACE_IQ_ROSTER = 'jabber:iq:roster';
 export const SPACE_IQ_LAST = 'jabber:iq:last';
 
 // ============ s SPACE 以这个为开头的全是命名空间相关 =========================
+
 
 
 /** 
@@ -25,6 +37,18 @@ export const ITEM_SUB_TYPE = {
     FROM: 'from',
     NONE: 'none',
     REMOVE: 'remove'
+}
+/**
+ * item 属性
+ * ASK（订阅的状态）
+ * ASK.SUBSCRIBE 订阅等待
+ * 
+ */
+export const ITEM_ATTR = {
+    ASK:{
+        SUBSCRIBE: 'subscribe',
+        UNSUBSCRIBE: 'unsubscribe'
+    }
 }
 
 

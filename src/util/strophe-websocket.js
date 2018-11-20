@@ -10,6 +10,7 @@ import {
 	IM_CHAT_MODULE_TYPE
 } from '../config/code';
 import {
+	XMPP_DOM,
 	SPACE_PING,
 	IQ_TYPE,
 	MASSAGE_TYPE,
@@ -102,10 +103,10 @@ function linkCallback(status, cb) {
 			// window.IM_WS.addHandler(handleGetPing, null, 'iq', 'ping1');
 
 			// 监听所有的 presence
-			window.IM_WS.addHandler(handleGetPres, null, 'presence')
+			window.IM_WS.addHandler(handleGetPres, null, XMPP_DOM.PRESENCE)
 
 			// 监听用户列表的改变 presence
-			window.IM_WS.addHandler(handleGetUserListChange, null, 'iq')
+			window.IM_WS.addHandler(handleGetUserListChange, SPACE_IQ_ROSTER, XMPP_DOM.IQ , IQ_TYPE.SET)
 
 			// 首先要发送一个<presence>给服务器（initial presence）
 			window.IM_WS.send(StropheJS.$pres().tree());
@@ -405,6 +406,7 @@ function handleGetPres(pres){
 		
 	}
 	console.log(pres)
+	return true;
 }
 
 
@@ -424,6 +426,7 @@ function handleGetUserListChange(iqELe){
 	// 	console.log(iqELe)
 	// 	console.log('=================== e 用户列表状态监听 ============')
 	// }	
+	return true;
 }
 
 // 日志监听
@@ -472,8 +475,9 @@ function onSendPing(to = IM_SERVE.hostname) {
 	if(window.IM_WS.connected){
 		return true;
 	}else{
-		// 删除定时器方法
-		window.IM_WS.deledeleteTimedHandler(onSendPing);
+		// 删除定时器方法 
+		// window.IM_WS.deledeleteTimedHandler(onSendPing); // 这里有问题不是返回调用函数而是add 的引用 暂时注销
+
 		// 重新创建 (未测试，这里只能是网络断掉 window)
 		window.IM_WS.reset()
 		return false;
