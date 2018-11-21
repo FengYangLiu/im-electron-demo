@@ -44,16 +44,16 @@ class ImMain extends Component {
             <NavLink className="main-nav-item" to="/chat" activeClassName="main-left_nav-active">
               <div className="item-icon icon-nav-section"></div>
             </NavLink>
-            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+            <NavLink className="main-nav-item" to="/search" activeClassName="main-left_nav-active">
               <div className="item-icon icon-nav-search"></div>
             </NavLink>
             <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
               <div className="item-icon icon-nav-linkman"></div>
             </NavLink>
-            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+            <NavLink className="main-nav-item" to="/friends" activeClassName="main-left_nav-active">
               <div className="item-icon icon-nav-friends"></div>
             </NavLink>
-            <NavLink className="main-nav-item" to="/userList" activeClassName="main-left_nav-active">
+            <NavLink className="main-nav-item" to="/setting" activeClassName="main-left_nav-active">
               <div className="item-icon icon-nav-setting"></div>
             </NavLink>
           </div>

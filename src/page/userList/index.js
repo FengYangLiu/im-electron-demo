@@ -5,7 +5,8 @@ import {
 	Modal,
 	Input,
 	Icon,
-	message
+	message,
+	Avatar
 } from 'antd';
 import {
 	imAddFriend
@@ -84,43 +85,62 @@ class ImUserList extends Component {
 		return (
 		<div className="im-user" >
 			<div className="im-user-list" >
-				<div className="group-chat-btn border-bottom" > 群聊 </div> 
+				<div className="group-chat-btn border-bottom" > 
+					<span>
+						通讯录
+					</span>
+					<Icon className="add-friend" type="plus" onClick={ this.showModal }  />
+				 </div> 
 			<div className="new-friend-text border-bottom" > 新的朋友 </div>
-				<div onClick={ this.showModal } className="new-friend-btn border-bottom" >
+				<div className="new-friend-btn border-bottom" >
 					<div className="user-img" />
 					新的朋友
 				</div> 
-			<div className="user-list" > {
-						userList.map((item) => (
-						<NavLink to={`/userList/${item.name}`}
-							className="user-list-item" >
-							<div className="user-img" >
-								{ } 
-							</div> 
-							<div className="user-name" > 
-								{ item.name} 
-							</div> 
-						</NavLink>
-						))
+			<div className="user-list" >
+			 {
+						// userList.map((item) => (
+						// <NavLink to={`/userList/${item.name}`}
+						// 	className="user-list-item" >
+						// 	<div className="user-img" >
+								
+						// 	</div> 
+						// 	<div className="user-name" > 
+						// 		{ item.name} 
+						// 	</div> 
+						// </NavLink>
+						// ))
 					} 
 					{
-						/* <NavLink to="/userList/1" className="user-list-item">
-													<div className="user-img">
-													lfy2
-													</div>
-													<div className="user-name">
+						 <NavLink to="/userList/1" className="user-list-item">
+						 							<div className="user-avater-wrap">
+														<Avatar className="user-avater">
+														lfy2
+														</Avatar>
+													 </div>
+													<div className="user-info-content">
+														<div className="user-name">
 		
-													sss
+														sss
+														</div>
+														<div className="user-title">
+		
+														sss
+														</div>
 													</div>
-												</NavLink> */
+													
+												</NavLink> 
 					} 
 				</div> 
 					</div>
-				 <Modal title="新的好友"
+				 <Modal title="添加好友"
+				 		className="add-friend-modal"
 						visible={ this.state.visible }
 						onOk={ this.handleOk }
-						onCancel={ this.handleCancel } >
-				<Input placeholder="Enter your username"
+						onCancel={ this.handleCancel }
+						okText="确认"
+          				cancelText="取消"
+						>
+				<Input placeholder="请输入账号"
 					prefix={< Icon type="user"
 						style={{ color: 'rgba(0,0,0,.25)' }}
 					/>}

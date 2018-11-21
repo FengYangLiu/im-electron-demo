@@ -7,14 +7,24 @@
     background-color: #fff;
     box-shadow: 0 0 10px 2px rgb(238, 237, 237);
     border-radius: 5px;
-    
+    .add-friend-modal{
+        width: 400px;
+        height: 161px;
+    }
     .border-bottom{
         border-bottom: 1px solid rgb(237, 237, 237);
     }
     .im-user-list{
         .group-chat-btn{
-            height: 44px;
-            padding: 10px 10px 0; 
+            height: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px ; 
+            .add-friend{
+                cursor: pointer;
+                color: #6597f1;
+            }
         }
         .new-friend-text{
             padding: 3px 10px;
@@ -51,26 +61,38 @@
 
         .user-list-item{
             display: flex;
-            height: 44px;
-            line-height: 44px;
+            height: 60px;
+            justify-content: space-between;
             align-items: center;
-            padding: 5px 10px;
+            .user-avater-wrap{
+                padding: 12px;
+                .user-avater{
+                    width: 36px;
+                    height: 36px;
+                    line-height: 36px;
+                    text-align: center;
+                    color: #fff;
+                    font-weight: 500px;
+                    background-color: lightcoral;
+                }
+            }
 
-            .user-img{
-                width: 30px;
-                height: 30px;
-                line-height: 30px;
-                text-align: center;
-                border-radius:5px;
-                color: #fff;
-                font-weight: 500px;
-                background-color: lightcoral;
+            .user-info-content{
+                flex:1;
+                height: 60px;
+                border-bottom: 1px solid #e6e5e6;
+                padding: 5px 0;
+                    .user-name{
+                        font-size: 16px;
+                        font-weight: 500;
+                        color: #555f6a;
+                    }
+                    .user-title{
+
+                    }
             }
-            .user-name{
-                padding: 0 10px;
-                font-size: 16px;
-                font-weight: 500;
-            }
+           
+            
             &:hover{
                 background-color: #cccccc;
                 cursor: pointer; 
