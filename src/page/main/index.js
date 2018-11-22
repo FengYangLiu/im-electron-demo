@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Route, Switch, NavLink } from "react-router-dom";
-import { Icon } from "antd";
 
 import ImChat from "../chat";
 import ImUserList from "../userList";
 import ChatSection from '../chat/chatSection'
 import InformSection from '../chat/informSection';
 import UserListSection from '../userList/userListSection'
+import ImUserSetting from '../setting'
 import ElectronAid from '../../electron'
 import { initWS,} from "../../util/strophe-websocket";
 
@@ -62,6 +62,7 @@ class ImMain extends Component {
               <Switch>
                 <Route path="/chat" component={ImChat} />
                 <Route path="/userList" component={ImUserList} />
+                <Route path="/setting" component={ImUserSetting} />
               </Switch>
             </div>
             <div className="mian-chat-content">
