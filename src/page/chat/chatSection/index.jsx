@@ -1,14 +1,17 @@
 import React, { Component } from "react";
 import { withRouter } from 'react-router-dom'
 import { Input, Button, Avatar, Popover } from "antd";
-import { IM_SERVE } from '../../../config/config'
-import { IM_CHAT_MODULE_TYPE } from '../../../config/code'
-import "./index.less";
-
-import Face from '../../components/Face'
-import { oldFaceSize } from '../../components/Face/FaceSection/faceSize'
+import { connect } from "react-redux";
 // websocket 暴露接口
 import { imSendMsg } from "../../../util/strophe-websocket";
+
+import { IM_SERVE } from '../../../config/config'
+import { IM_CHAT_MODULE_TYPE } from '../../../config/code'
+
+import { oldFaceSize } from '../../components/Face/FaceSection/faceSize'
+import Face from '../../components/Face'
+
+import SectionIntroButtons from '../../components/SectionIntroButtons'
 
 // action 统一管理
 import {
@@ -16,23 +19,25 @@ import {
   hadleFaceChangeAction
 } from "../../../store/actionCreators";
 
-import { connect } from "react-redux";
+import "./index.less";
 
 const { TextArea } = Input;
-const IM_FACE_TIME = ''
+const IM_FACE_TIME = '';
 let that;
 
 class ChatSection extends Component {
   constructor(props) {
     super(props);
+    console.log(props)
+    const userId = props.match.params.id
     that = this;
     this.state = {
       msgText: "",
-      tagetUser: `admin@${IM_SERVE.hostname}`,
+      tagetUser: `${userId}@${IM_SERVE.hostname}`,
       chatList: [],
       visible: false,
       chatUserInfo: {
-        name: 'admin',
+        name: userId,
         headerText: '管理员',
         type: IM_CHAT_MODULE_TYPE.SINGLE
       }
@@ -166,8 +171,8 @@ class ChatSection extends Component {
               {chatUserInfo.headerText}
             </div>
           </div>
-          <div>
-            图标
+          <div className="section-top-right">
+            <SectionIntroButtons userInfo={chatUserInfo} />
           </div>
         </div>
         <div className="section-center">

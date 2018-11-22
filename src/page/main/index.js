@@ -57,7 +57,7 @@ class ImMain extends Component {
               <div className="item-icon icon-nav-setting"></div>
             </NavLink>
           </div>
-          <div className="main-right">
+          <div className="main-right" id="main-right">
             <div className="main-chat-nav">
               <Switch>
                 <Route path="/chat" component={ImChat} />
