@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import './index.less'
 import { Switch, Button } from 'antd';
+import { withRouter } from 'react-router-dom'
+import { outLogin } from '../../util/strophe-websocket';
 class ImUserSetting extends Component{
+    handleOutLogin = () =>{
+        outLogin(()=>{
+
+        })
+    }
     render(){
         return (
             <div className="im-setting">
@@ -22,7 +29,7 @@ class ImUserSetting extends Component{
                         <Switch />
                     </div>
                     <div className="setting-item out-login">
-                        <Button type="danger" size="small"> 退出登录 </Button>
+                        <Button type="danger" size="small" onClick={this.handleOutLogin}> 退出登录 </Button>
                     </div>
                 </div>
             </div>
@@ -30,4 +37,4 @@ class ImUserSetting extends Component{
     }
 }
 
-export default ImUserSetting;
+export default withRouter(ImUserSetting);

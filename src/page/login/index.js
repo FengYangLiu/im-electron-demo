@@ -9,6 +9,7 @@ import { Form, Icon, Input, Button, Spin, Tabs } from "antd";
 import WindowHandle from '../components/WindowHandle';
 import store from "../../store/index.js";
 import { connect } from 'react-redux';
+import { autoUpdater } from "electron-updater"
 
 // websocket 暴露接口
 import { initWS, imSendMsg, outLogin } from "../../util/strophe-websocket";
@@ -49,14 +50,14 @@ class LoginMain extends Component {
         console.log("发送的变量: ", values);
         this.props.handleActionUserLogin(values);
         this.setLoginState(true);
-        // if(ElectronAid){
-
-        //   ElectronAid.loginToMainSync(window.IM_WS)
-        // }else{
+        if(ElectronAid){
+          autoUpdater.checkForUpdatesAndNotify()
+          ElectronAid.loginToMainSync(window.IM_WS)
+        }else{
           initWS(()=>{
             this.setLoginState(false);
           });
-        // }
+        }
       }
     });
   };
